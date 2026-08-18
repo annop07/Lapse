@@ -20,12 +20,16 @@ class WallScreen extends StatefulWidget {
     required this.store,
     required this.onClose,
     required this.onShare,
+    this.onAddFriend,
     super.key,
   });
 
   final LapseStore store;
   final VoidCallback onClose;
   final VoidCallback onShare;
+
+  /// null เมื่อต่อเซิร์ฟเวอร์ไม่ได้
+  final VoidCallback? onAddFriend;
 
   @override
   State<WallScreen> createState() => _WallScreenState();
@@ -186,7 +190,11 @@ class _WallScreenState extends State<WallScreen> {
               colors: colors,
             ),
           SizedBox(height: LapseSpace.s8),
-          _Friends(handle: widget.store.meta.handle, colors: colors),
+          _Friends(
+            handle: widget.store.meta.handle,
+            onAddFriend: widget.onAddFriend,
+            colors: colors,
+          ),
         ],
       ),
     );
@@ -467,9 +475,14 @@ class _Detail extends StatelessWidget {
 
 /// รายชื่อเพื่อน — v0 มีแค่ตัวเอง แต่คำแถลงจุดยืนต้องอยู่ตั้งแต่แรก
 class _Friends extends StatelessWidget {
-  const _Friends({required this.handle, required this.colors});
+  const _Friends({
+    required this.handle,
+    required this.onAddFriend,
+    required this.colors,
+  });
 
   final String handle;
+  final VoidCallback? onAddFriend;
   final LapseColors colors;
 
   @override
@@ -490,6 +503,24 @@ class _Friends extends StatelessWidget {
             handle.isEmpty ? 'คุณ' : '$handle (คุณ)',
             style: lapseTextStyle(LapseType.body, color: colors.ink),
           ),
+          if (onAddFriend != null)
+            GestureDetector(
+              onTap: onAddFriend,
+              behavior: HitTestBehavior.opaque,
+              child: SizedBox(
+                height: LapseSpace.touch,
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    '+ เพิ่มเพื่อน',
+                    style: lapseTextStyle(
+                      LapseType.label,
+                      color: colors.inkMuted,
+                    ),
+                  ),
+                ),
+              ),
+            ),
         ],
       );
 }

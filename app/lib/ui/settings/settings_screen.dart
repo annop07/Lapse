@@ -15,6 +15,7 @@ class SettingsScreen extends StatefulWidget {
     required this.store,
     required this.onClose,
     required this.onExport,
+    this.onOpenAccount,
     super.key,
   });
 
@@ -23,6 +24,9 @@ class SettingsScreen extends StatefulWidget {
 
   /// ส่งโฟลเดอร์ทั้งก้อนออกไป — ฟรีเสมอ เป็นคำสัญญาของแบรนด์
   final Future<void> Function() onExport;
+
+  /// null เมื่อต่อเซิร์ฟเวอร์ไม่ได้ · แอปยังใช้ได้ครบโดยไม่มีบัญชี
+  final VoidCallback? onOpenAccount;
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
@@ -71,6 +75,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onChanged: widget.store.setHandle,
             colors: colors,
           ),
+          if (widget.onOpenAccount != null) ...[
+            _Divider(colors: colors),
+            _SectionLabel('บัญชีและซิงก์', colors: colors),
+            _TextAction(
+              label: 'บัญชี',
+              note: 'เข้าสู่ระบบเพื่อซิงก์ข้ามเครื่องและเพิ่มเพื่อน',
+              onTap: () async => widget.onOpenAccount!(),
+              colors: colors,
+            ),
+          ],
           _Divider(colors: colors),
           _SectionLabel('ข้อมูลของคุณ', colors: colors),
           _TextAction(

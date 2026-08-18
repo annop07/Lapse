@@ -6,12 +6,15 @@ library;
 
 import 'package:flutter/widgets.dart';
 
+import 'data/lapse_server.dart';
 import 'data/meta_store.dart';
 import 'model/duration_fmt.dart';
 import 'store/lapse_store.dart';
 import 'tokens/lapse_theme.dart';
 import 'tokens/lapse_tokens.dart';
+import 'ui/account/account_screen.dart';
 import 'ui/day/day_screen.dart';
+import 'ui/friends/add_friend_sheet.dart';
 import 'ui/focus/focus_screen.dart';
 import 'ui/onboarding/onboarding_screen.dart';
 import 'ui/settings/settings_screen.dart';
@@ -21,13 +24,21 @@ import 'ui/wall/wall_screen.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final store = await LapseStore.open();
-  runApp(LapseApp(store: store));
+  // เซิร์ฟเวอร์ต่อไม่ติดก็ต้องใช้แอปได้ตามปกติ ข้อมูลอยู่ในเครื่องอยู่แล้ว
+  LapseServer? server;
+  try {
+    server = await LapseServer.start();
+  } on Object catch (_) {
+    server = null;
+  }
+  runApp(LapseApp(store: store, server: server));
 }
 
 class LapseApp extends StatelessWidget {
-  const LapseApp({required this.store, super.key});
+  const LapseApp({required this.store, this.server, super.key});
 
   final LapseStore store;
+  final LapseServer? server;
 
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
@@ -50,7 +61,7 @@ class LapseApp extends StatelessWidget {
               ),
               child: Directionality(
                 textDirection: TextDirection.ltr,
-                child: _Root(store: store),
+                child: _Root(store: store, server: server),
               ),
             ),
           );
@@ -59,9 +70,10 @@ class LapseApp extends StatelessWidget {
 }
 
 class _Root extends StatefulWidget {
-  const _Root({required this.store});
+  const _Root({required this.store, this.server});
 
   final LapseStore store;
+  final LapseServer? server;
 
   @override
   State<_Root> createState() => _RootState();
@@ -165,11 +177,17 @@ class _RootState extends State<_Root> {
 
   bool _settingsOpen = false;
   bool _shareOpen = false;
+  bool _accountOpen = false;
+  bool _addFriendOpen = false;
 
   void _openWall() => setState(() => _wallOpen = true);
   void _closeWall() => setState(() => _wallOpen = false);
   void _openShare() => setState(() => _shareOpen = true);
   void _closeShare() => setState(() => _shareOpen = false);
+  void _openAccount() => setState(() => _accountOpen = true);
+  void _closeAccount() => setState(() => _accountOpen = false);
+  void _openAddFriend() => setState(() => _addFriendOpen = true);
+  void _closeAddFriend() => setState(() => _addFriendOpen = false);
   void _openSettings() => setState(() => _settingsOpen = true);
   void _closeSettings() => setState(() => _settingsOpen = false);
 
@@ -208,6 +226,7 @@ class _RootState extends State<_Root> {
             store: store,
             onClose: _closeWall,
             onShare: _openShare,
+            onAddFriend: widget.server == null ? null : _openAddFriend,
           ),
         if (_shareOpen) ShareScreen(store: store, onClose: _closeShare),
         if (_settingsOpen)
@@ -215,6 +234,19 @@ class _RootState extends State<_Root> {
             store: store,
             onClose: _closeSettings,
             onExport: store.exporter.share,
+            onOpenAccount: widget.server == null ? null : _openAccount,
+          ),
+        if (_accountOpen && widget.server != null)
+          AccountScreen(
+            store: store,
+            server: widget.server!,
+            onClose: _closeAccount,
+          ),
+        if (_addFriendOpen && widget.server != null)
+          AddFriendSheet(
+            server: widget.server!,
+            onClose: _closeAddFriend,
+            onAdded: () => setState(() {}),
           ),
         if (focused != null)
           FocusScreen(
