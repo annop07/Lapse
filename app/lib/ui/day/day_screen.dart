@@ -148,12 +148,8 @@ class DayScreenState extends State<DayScreen> {
     return GestureDetector(
       // แตะที่ใดก็ตามที่ไม่ใช่ช่องพิมพ์แล้วปิดคีย์บอร์ด
       onTap: () => FocusScope.of(context).unfocus(),
-      // ปัดซ้ายขวาเปลี่ยนวัน (§4.1)
-      onHorizontalDragEnd: (details) {
-        final v = details.primaryVelocity ?? 0;
-        if (v > 200) store.goBackOneDay();
-        if (v < -200) store.goForwardOneDay();
-      },
+      // §4.1 ระบุให้ปัดซ้ายขวาเปลี่ยนวันได้ด้วย แต่ถูกถอดออกตามที่เจ้าของ
+      // ผลิตภัณฑ์ตัดสินใจหลังลองใช้จริง — เปลี่ยนวันด้วยลูกศรอย่างเดียว
       child: ColoredBox(
         color: colors.surface,
         // ไม่ได้ใช้ Scaffold จึงไม่มี resizeToAvoidBottomInset มาให้

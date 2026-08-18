@@ -166,7 +166,7 @@ void main() {
     expect(text, contains('จำได้แค่สูตรอนุพันธ์'));
   });
 
-  testWidgets('ปัดเปลี่ยนวัน และห้ามไปวันอนาคต', (tester) async {
+  testWidgets('เปลี่ยนวันด้วยลูกศร และห้ามไปวันอนาคต', (tester) async {
     app.main();
     await settle(tester);
     await tester.enterText(find.byType(EditableText).first, 'สรุปฟิสิกส์');
@@ -175,27 +175,28 @@ void main() {
     await settle(tester);
 
     final today = DateTime.now();
-    expect(find.text('${today.day} ${_month(today.month)}'), findsOneWidget);
+    final yesterday = today.subtract(const Duration(days: 1));
+    String label(DateTime d) => '${d.day} ${_month(d.month)}';
 
-    // ปัดขวาเพื่อถอยไปเมื่อวาน
+    expect(find.text(label(today)), findsOneWidget);
+
+    await tester.tap(find.text('‹'));
+    await settle(tester);
+    expect(find.text(label(yesterday)), findsOneWidget);
+
+    await tester.tap(find.text('›'));
+    await settle(tester);
+    expect(find.text(label(today)), findsOneWidget);
+
+    // อยู่ที่วันนี้แล้ว ลูกศรขวาต้องตาย
+    await tester.tap(find.text('›'));
+    await settle(tester);
+    expect(find.text(label(today)), findsOneWidget);
+
+    // การปัดถูกถอดออกตามที่เจ้าของผลิตภัณฑ์ตัดสินใจ ต้องไม่เปลี่ยนวัน
     await tester.fling(find.byType(DayScreen), const Offset(300, 0), 800);
     await settle(tester);
-
-    final yesterday = today.subtract(const Duration(days: 1));
-    expect(
-      find.text('${yesterday.day} ${_month(yesterday.month)}'),
-      findsOneWidget,
-    );
-
-    // ปัดซ้ายกลับมาวันนี้
-    await tester.fling(find.byType(DayScreen), const Offset(-300, 0), 800);
-    await settle(tester);
-    expect(find.text('${today.day} ${_month(today.month)}'), findsOneWidget);
-
-    // ปัดซ้ายอีกครั้งต้องไปไหนไม่ได้
-    await tester.fling(find.byType(DayScreen), const Offset(-300, 0), 800);
-    await settle(tester);
-    expect(find.text('${today.day} ${_month(today.month)}'), findsOneWidget);
+    expect(find.text(label(today)), findsOneWidget);
   });
 
   testWidgets('เปิดกำแพงและหน้าตั้งค่าจากหน้าวัน', (tester) async {
