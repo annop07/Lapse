@@ -126,6 +126,11 @@ class LapseStore extends ChangeNotifier {
 
   Future<Map<String, int>> minutesByDate() => _days.minutesByDate();
 
+  /// อ่านวันหนึ่งโดยไม่ย้ายวันที่กำลังดูอยู่
+  ///
+  /// แผงรายละเอียดของกำแพงใช้ตัวนี้ การแตะดูวันเก่าไม่ควรพาผู้ใช้ออกจากวันนี้
+  Future<Day> dayAt(DateTime date) => _days.load(dateOnly(date));
+
   // ---- meta ----
 
   Future<void> setTheme(ThemeChoice choice) =>

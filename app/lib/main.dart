@@ -12,6 +12,7 @@ import 'tokens/lapse_theme.dart';
 import 'tokens/lapse_tokens.dart';
 import 'ui/day/day_screen.dart';
 import 'ui/focus/focus_screen.dart';
+import 'ui/wall/wall_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -149,9 +150,10 @@ class _RootState extends State<_Root> {
     });
   }
 
-  Future<void> _openWall() async {
-    // หน้ากำแพงมาใน Phase 5
-  }
+  bool _wallOpen = false;
+
+  void _openWall() => setState(() => _wallOpen = true);
+  void _closeWall() => setState(() => _wallOpen = false);
 
   @override
   Widget build(BuildContext context) {
@@ -170,6 +172,8 @@ class _RootState extends State<_Root> {
           onStartFocus: _startFocus,
           onOpenWall: _openWall,
         ),
+        if (_wallOpen)
+          WallScreen(store: store, onClose: _closeWall),
         if (focused != null)
           FocusScreen(
             what: focused < lines.length ? lines[focused].text : '',
