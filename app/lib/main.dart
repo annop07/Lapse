@@ -15,6 +15,7 @@ import 'ui/day/day_screen.dart';
 import 'ui/focus/focus_screen.dart';
 import 'ui/onboarding/onboarding_screen.dart';
 import 'ui/settings/settings_screen.dart';
+import 'ui/share/share_screen.dart';
 import 'ui/wall/wall_screen.dart';
 
 Future<void> main() async {
@@ -163,9 +164,12 @@ class _RootState extends State<_Root> {
   bool _wallOpen = false;
 
   bool _settingsOpen = false;
+  bool _shareOpen = false;
 
   void _openWall() => setState(() => _wallOpen = true);
   void _closeWall() => setState(() => _wallOpen = false);
+  void _openShare() => setState(() => _shareOpen = true);
+  void _closeShare() => setState(() => _shareOpen = false);
   void _openSettings() => setState(() => _settingsOpen = true);
   void _closeSettings() => setState(() => _settingsOpen = false);
 
@@ -199,7 +203,13 @@ class _RootState extends State<_Root> {
           onOpenWall: _openWall,
           onOpenSettings: _openSettings,
         ),
-        if (_wallOpen) WallScreen(store: store, onClose: _closeWall),
+        if (_wallOpen)
+          WallScreen(
+            store: store,
+            onClose: _closeWall,
+            onShare: _openShare,
+          ),
+        if (_shareOpen) ShareScreen(store: store, onClose: _closeShare),
         if (_settingsOpen)
           SettingsScreen(
             store: store,

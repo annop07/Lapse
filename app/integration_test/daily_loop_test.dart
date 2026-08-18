@@ -18,6 +18,7 @@ import 'package:lapse/ui/day/line_row.dart';
 import 'package:lapse/ui/focus/focus_screen.dart';
 import 'package:lapse/ui/onboarding/onboarding_screen.dart';
 import 'package:lapse/ui/settings/settings_screen.dart';
+import 'package:lapse/ui/share/share_screen.dart';
 import 'package:lapse/ui/wall/wall_screen.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -238,6 +239,16 @@ void main() {
     await settle(tester);
     expect(find.byType(WallScreen), findsOneWidget);
     expect(find.text('ไม่มีอันดับ — เรียงตามลำดับที่เพิ่ม'), findsOneWidget);
+
+    // การ์ดแชร์เปิดจากกำแพง ไม่ใช่จากหน้าวัน (§4.5)
+    await tester.tap(find.text('แบ่งปัน'));
+    await settle(tester);
+    expect(find.byType(ShareScreen), findsOneWidget);
+    expect(find.text('312 ชั่วโมง ในปี ${DateTime.now().year}'), findsNothing);
+
+    await tester.tap(find.text('‹ กำแพง'));
+    await settle(tester);
+    expect(find.byType(ShareScreen), findsNothing);
 
     await tester.tap(find.text('‹ วัน'));
     await settle(tester);

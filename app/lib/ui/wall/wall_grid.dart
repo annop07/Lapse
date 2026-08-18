@@ -35,6 +35,8 @@ class WallGridPainter extends CustomPainter {
     required this.devicePixelRatio,
     required this.outline,
     this.selected,
+    this.cell = kWallCell,
+    this.gap = kWallGap,
   });
 
   /// ระดับ 0–4 ของแต่ละวัน เรียงตามเวลา · `null` คือช่องที่ไม่มีอยู่จริงในปีนั้น
@@ -51,18 +53,26 @@ class WallGridPainter extends CustomPainter {
   /// ดัชนีของช่องที่เลือกอยู่ · null = ยังไม่ได้เลือก
   final int? selected;
 
+  /// การ์ดแชร์วาดเล็กกว่านี้ได้ เพราะเป็นภาพ ไม่ใช่พื้นที่ที่ต้องกด
+  final double cell;
+  final double gap;
+
   int get columns => (levels.length / kWallRows).ceil();
 
-  static double gridWidth(int columns) =>
-      columns * kWallCell + (columns - 1) * kWallGap;
+  static double gridWidth(int columns,
+          {double cell = kWallCell, double gap = kWallGap}) =>
+      columns * cell + (columns - 1) * gap;
 
-  static double gridHeight() =>
-      kWallRows * kWallCell + (kWallRows - 1) * kWallGap;
+  static double gridHeight({double cell = kWallCell, double gap = kWallGap}) =>
+      kWallRows * cell + (kWallRows - 1) * gap;
 
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()..isAntiAlias = true;
-    final radius = Radius.circular(LapseRadius.cell);
+    // รัศมีต้องได้สัดส่วนกับช่อง ไม่งั้นช่องเล็กๆ บนการ์ดแชร์จะกลายเป็นวงกลม
+    final radius = Radius.circular(
+      LapseRadius.cell < cell * 0.3 ? LapseRadius.cell : cell * 0.3,
+    );
 
     for (var i = 0; i < levels.length; i++) {
       final level = levels[i];
@@ -71,13 +81,13 @@ class WallGridPainter extends CustomPainter {
       final column = i ~/ kWallRows;
       final row = i % kWallRows;
 
-      final left = snapToPixel(column * (kWallCell + kWallGap), devicePixelRatio);
-      final top = snapToPixel(row * (kWallCell + kWallGap), devicePixelRatio);
+      final left = snapToPixel(column * (cell + gap), devicePixelRatio);
+      final top = snapToPixel(row * (cell + gap), devicePixelRatio);
       final rect = Rect.fromLTRB(
         left,
         top,
-        snapToPixel(left + kWallCell, devicePixelRatio),
-        snapToPixel(top + kWallCell, devicePixelRatio),
+        snapToPixel(left + cell, devicePixelRatio),
+        snapToPixel(top + cell, devicePixelRatio),
       );
 
       paint.color = ramp[level.clamp(0, ramp.length - 1)];
@@ -111,6 +121,8 @@ class WallGrid extends StatelessWidget {
     required this.ramp,
     required this.outline,
     this.selected,
+    this.cell = kWallCell,
+    this.gap = kWallGap,
     super.key,
   });
 
@@ -118,6 +130,8 @@ class WallGrid extends StatelessWidget {
   final List<Color> ramp;
   final Color outline;
   final int? selected;
+  final double cell;
+  final double gap;
 
   @override
   Widget build(BuildContext context) {
@@ -126,12 +140,14 @@ class WallGrid extends StatelessWidget {
       ramp: ramp,
       outline: outline,
       selected: selected,
+      cell: cell,
+      gap: gap,
       devicePixelRatio: MediaQuery.devicePixelRatioOf(context),
     );
     return CustomPaint(
       size: Size(
-        WallGridPainter.gridWidth(painter.columns),
-        WallGridPainter.gridHeight(),
+        WallGridPainter.gridWidth(painter.columns, cell: cell, gap: gap),
+        WallGridPainter.gridHeight(cell: cell, gap: gap),
       ),
       painter: painter,
     );

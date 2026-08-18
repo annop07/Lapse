@@ -16,10 +16,16 @@ import '../../tokens/lapse_tokens.dart';
 import 'wall_grid.dart';
 
 class WallScreen extends StatefulWidget {
-  const WallScreen({required this.store, required this.onClose, super.key});
+  const WallScreen({
+    required this.store,
+    required this.onClose,
+    required this.onShare,
+    super.key,
+  });
 
   final LapseStore store;
   final VoidCallback onClose;
+  final VoidCallback onShare;
 
   @override
   State<WallScreen> createState() => _WallScreenState();
@@ -140,6 +146,7 @@ class _WallScreenState extends State<WallScreen> {
         children: [
           _Header(
             handle: widget.store.meta.handle,
+            onShare: widget.onShare,
             year: _year,
             totalSeconds: totalSeconds,
             daysWithTime: daysWithTime,
@@ -193,6 +200,7 @@ class _Header extends StatelessWidget {
     required this.totalSeconds,
     required this.daysWithTime,
     required this.onClose,
+    required this.onShare,
     required this.colors,
   });
 
@@ -201,6 +209,7 @@ class _Header extends StatelessWidget {
   final int totalSeconds;
   final int daysWithTime;
   final VoidCallback onClose;
+  final VoidCallback onShare;
   final LapseColors colors;
 
   @override
@@ -218,6 +227,24 @@ class _Header extends StatelessWidget {
                     alignment: Alignment.centerLeft,
                     child: Text(
                       '‹ วัน',
+                      style: lapseTextStyle(
+                        LapseType.label,
+                        color: colors.inkMuted,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const Spacer(),
+              GestureDetector(
+                onTap: onShare,
+                behavior: HitTestBehavior.opaque,
+                child: SizedBox(
+                  height: LapseSpace.touch,
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      'แบ่งปัน',
                       style: lapseTextStyle(
                         LapseType.label,
                         color: colors.inkMuted,
