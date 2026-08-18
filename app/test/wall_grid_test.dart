@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lapse/ui/wall/wall_grid.dart';
 
@@ -45,14 +47,21 @@ void main() {
   group('เรขาคณิตของตาราง', () {
     test('ขนาดของทั้งปี', () {
       // 53 คอลัมน์ = 53 ช่อง + 52 ช่องว่าง
-      expect(WallGridPainter.gridWidth(53), 53 * 7 + 52 * 2);
-      expect(WallGridPainter.gridHeight(), 7 * 7 + 6 * 2);
+      expect(
+        WallGridPainter.gridWidth(53),
+        53 * kWallCell + 52 * kWallGap,
+      );
+      expect(
+        WallGridPainter.gridHeight(),
+        kWallRows * kWallCell + (kWallRows - 1) * kWallGap,
+      );
     });
 
     test('จำนวนคอลัมน์ปัดขึ้นเสมอ', () {
       WallGridPainter painter(int days) => WallGridPainter(
             levels: List<int?>.filled(days, 0),
             ramp: const [],
+            outline: const Color(0xFF000000),
             devicePixelRatio: 3,
           );
 

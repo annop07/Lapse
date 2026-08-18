@@ -136,7 +136,11 @@ class _WallSample extends StatelessWidget {
       children: [
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
-          child: WallGrid(levels: levels, ramp: colors.wall),
+          child: WallGrid(
+            levels: levels,
+            ramp: colors.wall,
+            outline: colors.ink,
+          ),
         ),
         SizedBox(height: LapseSpace.s4),
         Text(

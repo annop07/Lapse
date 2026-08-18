@@ -1,6 +1,11 @@
 /// ตารางกำแพง — คอลัมน์ละสัปดาห์ 7 แถว เริ่มจากวันอาทิตย์ (§4.4)
 ///
-/// ช่อง 7px เว้น 2px · ทั้งปีคือราว 53 คอลัมน์ = 371 ช่อง
+/// §4.4 กำหนดช่อง 7px เว้น 2px ซึ่งยืมมาจากกราฟ contributions ของ GitHub
+/// ที่ออกแบบมาสำหรับจอกว้างกับเมาส์ บนมือถือขนาดนั้นเล็กเกินกว่าจะแตะให้ตรงวัน
+/// และขัดกับกฎพื้นที่กดขั้นต่ำ 44px ของสเปกเอง
+///
+/// จึงขยายเป็นช่อง 14px เว้น 3px ตามที่เจ้าของผลิตภัณฑ์ตัดสินใจหลังลองใช้จริง
+/// ทั้งปียังอยู่ครบ แต่เห็นทีละราว 20 สัปดาห์แล้วเลื่อนย้อนดูได้
 ///
 /// ปัญหาที่ต้องระวังคือความคม ตัวเลขพวกนี้เล็กมากเมื่อเทียบกับพิกเซลจริง
 /// ถ้าปล่อยให้ Flutter ปัดพิกัดเอง ขอบจะเบลอไม่เท่ากันในแต่ละคอลัมน์
@@ -19,8 +24,8 @@ import '../../tokens/lapse_tokens.dart';
 double snapToPixel(double value, double devicePixelRatio) =>
     (value * devicePixelRatio).roundToDouble() / devicePixelRatio;
 
-const double kWallCell = 7;
-const double kWallGap = 2;
+const double kWallCell = 14;
+const double kWallGap = 3;
 const int kWallRows = 7;
 
 class WallGridPainter extends CustomPainter {
@@ -28,6 +33,8 @@ class WallGridPainter extends CustomPainter {
     required this.levels,
     required this.ramp,
     required this.devicePixelRatio,
+    required this.outline,
+    this.selected,
   });
 
   /// ระดับ 0–4 ของแต่ละวัน เรียงตามเวลา · `null` คือช่องที่ไม่มีอยู่จริงในปีนั้น
@@ -37,6 +44,12 @@ class WallGridPainter extends CustomPainter {
   final List<Color> ramp;
 
   final double devicePixelRatio;
+
+  /// สีของกรอบช่องที่เลือกอยู่
+  final Color outline;
+
+  /// ดัชนีของช่องที่เลือกอยู่ · null = ยังไม่ได้เลือก
+  final int? selected;
 
   int get columns => (levels.length / kWallRows).ceil();
 
@@ -68,7 +81,18 @@ class WallGridPainter extends CustomPainter {
       );
 
       paint.color = ramp[level.clamp(0, ramp.length - 1)];
-      canvas.drawRRect(RRect.fromRectAndRadius(rect, radius), paint);
+      final rounded = RRect.fromRectAndRadius(rect, radius);
+      canvas.drawRRect(rounded, paint);
+
+      // กรอบรอบช่องที่เลือก เพื่อให้เห็นว่ากดโดนวันไหน
+      if (i != selected) continue;
+      canvas.drawRRect(
+        rounded.inflate(LapseBorder.stroke),
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = LapseBorder.stroke
+          ..color = outline,
+      );
     }
   }
 
@@ -76,20 +100,32 @@ class WallGridPainter extends CustomPainter {
   bool shouldRepaint(WallGridPainter old) =>
       old.devicePixelRatio != devicePixelRatio ||
       old.ramp != ramp ||
+      old.selected != selected ||
+      old.outline != outline ||
       !identical(old.levels, levels);
 }
 
 class WallGrid extends StatelessWidget {
-  const WallGrid({required this.levels, required this.ramp, super.key});
+  const WallGrid({
+    required this.levels,
+    required this.ramp,
+    required this.outline,
+    this.selected,
+    super.key,
+  });
 
   final List<int?> levels;
   final List<Color> ramp;
+  final Color outline;
+  final int? selected;
 
   @override
   Widget build(BuildContext context) {
     final painter = WallGridPainter(
       levels: levels,
       ramp: ramp,
+      outline: outline,
+      selected: selected,
       devicePixelRatio: MediaQuery.devicePixelRatioOf(context),
     );
     return CustomPaint(

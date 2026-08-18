@@ -30,12 +30,42 @@ class _WallScreenState extends State<WallScreen> {
   DateTime? _selected;
   Day? _selectedDay;
 
+  /// กำแพงกว้างกว่าจอ จึงต้องเริ่มที่วันนี้
+  ///
+  /// ไม่ใช่ที่ต้นปีเพราะจะเห็นแต่ของเก่า และไม่ใช่ที่ท้ายปีเพราะจะเห็นแต่
+  /// ช่องว่างของวันที่ยังมาไม่ถึง
+  final _gridScroll = ScrollController();
+
   int get _year => DateTime.now().year;
 
   @override
   void initState() {
     super.initState();
     _load();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToToday());
+  }
+
+  @override
+  void dispose() {
+    _gridScroll.dispose();
+    super.dispose();
+  }
+
+  /// วางคอลัมน์ของวันนี้ไว้ชิดขอบขวาของช่องมอง
+  void _scrollToToday() {
+    if (!_gridScroll.hasClients) return;
+    final today = DateTime.now();
+    if (today.year != _year) return;
+
+    final first = DateTime(_year, 1, 1);
+    final column =
+        (sundayFirstWeekday(first) + today.difference(first).inDays) ~/
+            kWallRows;
+    final step = kWallCell + kWallGap;
+    final position = _gridScroll.position;
+    final target = (column + 1) * step - position.viewportDimension;
+
+    _gridScroll.jumpTo(target.clamp(0.0, position.maxScrollExtent));
   }
 
   Future<void> _load() async {
@@ -61,6 +91,14 @@ class _WallScreenState extends State<WallScreen> {
       cells.add(null);
     }
     return cells;
+  }
+
+  /// ดัชนีของช่องที่เลือกอยู่ในตาราง · null = ยังไม่ได้เลือก
+  int? _selectedIndex() {
+    final date = _selected;
+    if (date == null) return null;
+    final first = DateTime(_year, 1, 1);
+    return sundayFirstWeekday(first) + date.difference(first).inDays;
   }
 
   DateTime? _dateAt(int index) {
@@ -110,6 +148,7 @@ class _WallScreenState extends State<WallScreen> {
           ),
           SizedBox(height: LapseSpace.s8),
           SingleChildScrollView(
+            controller: _gridScroll,
             scrollDirection: Axis.horizontal,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -119,6 +158,8 @@ class _WallScreenState extends State<WallScreen> {
                 _TappableGrid(
                   levels: levels,
                   ramp: colors.wall,
+                  outline: colors.ink,
+                  selected: _selectedIndex(),
                   onTapCell: (index) {
                     final date = _dateAt(index);
                     if (date != null) _select(date);
@@ -262,11 +303,15 @@ class _TappableGrid extends StatelessWidget {
   const _TappableGrid({
     required this.levels,
     required this.ramp,
+    required this.outline,
+    required this.selected,
     required this.onTapCell,
   });
 
   final List<int?> levels;
   final List<Color> ramp;
+  final Color outline;
+  final int? selected;
   final ValueChanged<int> onTapCell;
 
   @override
@@ -283,7 +328,12 @@ class _TappableGrid extends StatelessWidget {
       child: SizedBox(
         width: WallGridPainter.gridWidth(columns),
         height: WallGridPainter.gridHeight(),
-        child: WallGrid(levels: levels, ramp: ramp),
+        child: WallGrid(
+          levels: levels,
+          ramp: ramp,
+          outline: outline,
+          selected: selected,
+        ),
       ),
     );
   }
