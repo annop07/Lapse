@@ -8,6 +8,8 @@ library;
 
 import 'package:flutter/widgets.dart';
 
+import '../../i18n/strings.dart';
+
 import '../../model/duration_fmt.dart';
 import '../../session/focus_session.dart';
 import '../../session/session_lifecycle.dart';
@@ -115,7 +117,9 @@ class _FocusScreenState extends State<FocusScreen> {
                       child: _Fading(
                         faded: faded,
                         child: Text(
-                          widget.what.isEmpty ? 'ไม่มีชื่อ' : widget.what,
+                          widget.what.isEmpty
+                              ? LapseStrings.of(context).untitled
+                              : widget.what,
                           textAlign: TextAlign.center,
                           textHeightBehavior: lapseTextHeightBehavior,
                           style: lapseTextStyle(
@@ -146,7 +150,7 @@ class _FocusScreenState extends State<FocusScreen> {
                       child: _Fading(
                         faded: faded,
                         child: Text(
-                          'แตะเพื่อดูเวลา\nกดค้างเพื่อจบ',
+                          LapseStrings.of(context).focusHint,
                           textAlign: TextAlign.center,
                           textHeightBehavior: lapseTextHeightBehavior,
                           style: lapseTextStyle(

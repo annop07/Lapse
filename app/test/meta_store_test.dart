@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lapse/data/meta_store.dart';
+import 'package:lapse/i18n/strings.dart';
 
 void main() {
   late Directory tmp;
@@ -55,9 +56,20 @@ void main() {
     "@nine"
   ],
   "theme": "auto",
+  "language": "auto",
   "createdAt": "2026-01-01"
 }
 ''');
+  });
+
+  test('ภาษาที่เลือกถูกเขียนและอ่านกลับ', () async {
+    await store.save(const Meta(language: Language.english));
+    expect((await store.load()).language, Language.english);
+  });
+
+  test('ไฟล์เก่าที่ไม่มีคีย์ภาษาได้ค่าตามระบบ', () async {
+    await store.file.writeAsString('{"handle":"@jan","theme":"dark"}');
+    expect((await store.load()).language, Language.auto);
   });
 
   test('ไฟล์พังไม่ทำให้เปิดแอปไม่ขึ้น', () async {

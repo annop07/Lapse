@@ -6,6 +6,8 @@ library;
 
 import 'package:flutter/widgets.dart';
 
+import '../../i18n/strings.dart';
+
 import '../../model/duration_fmt.dart';
 import '../../model/thai_date.dart';
 import '../../store/lapse_store.dart';
@@ -13,8 +15,7 @@ import '../../tokens/lapse_theme.dart';
 import '../../tokens/lapse_tokens.dart';
 import 'line_row.dart';
 
-/// ค่าเริ่มต้นของ placeholder ในช่องบันทึก (§4.3)
-const kJournalPlaceholder = 'วันนี้เป็นยังไงบ้าง';
+
 
 class DayScreen extends StatefulWidget {
   const DayScreen({
@@ -24,7 +25,7 @@ class DayScreen extends StatefulWidget {
     required this.onOpenSettings,
     this.journalFocus,
     this.journalController,
-    this.journalPlaceholder = kJournalPlaceholder,
+    required this.journalPlaceholder,
     super.key,
   });
 
@@ -275,7 +276,7 @@ class _TopBar extends StatelessWidget {
                 child: Align(
                   alignment: Alignment.centerRight,
                   child: Text(
-                    'กำแพง',
+                    LapseStrings.of(context).wallLink,
                     style: lapseTextStyle(
                       LapseType.micro,
                       color: colors.inkMuted,
@@ -298,6 +299,7 @@ class _DateHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final date = store.cursor;
+    final strings = LapseStrings.of(context);
     return Padding(
       padding: EdgeInsets.fromLTRB(
         LapseSpace.gutter,
@@ -317,11 +319,11 @@ class _DateHeader extends StatelessWidget {
             child: Column(
               children: [
                 Text(
-                  thaiDayAndMonth(date),
+                  dayAndMonth(date, thai: strings.isThai),
                   style: lapseTextStyle(LapseType.title, color: colors.ink),
                 ),
                 Text(
-                  thaiWeekdayAndYear(date),
+                  weekdayAndYear(date, thai: strings.isThai),
                   style: lapseTextStyle(
                     LapseType.caption,
                     color: colors.inkMuted,
@@ -391,7 +393,7 @@ class _AddLineButton extends StatelessWidget {
           child: Align(
             alignment: Alignment.centerLeft,
             child: Text(
-              '+ บรรทัดใหม่',
+              LapseStrings.of(context).newLine,
               style: lapseTextStyle(LapseType.label, color: colors.inkMuted),
             ),
           ),
@@ -511,7 +513,7 @@ class _BottomBar extends StatelessWidget {
         child: Row(
           children: [
             Text(
-              'กดค้างที่บรรทัดเพื่อเริ่ม',
+              LapseStrings.of(context).holdHint,
               style: lapseTextStyle(LapseType.micro, color: colors.inkFaint),
             ),
             const Spacer(),

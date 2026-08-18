@@ -36,6 +36,12 @@ Future<void> wipe() async {
   final docs = await getApplicationDocumentsDirectory();
   final root = Directory('${docs.path}/lapse');
   if (await root.exists()) await root.delete(recursive: true);
+
+  // ตรึงภาษาเป็นไทย ไม่งั้นเทสต์จะขึ้นกับภาษาของเครื่องที่รัน
+  // ซึ่งเป็นอังกฤษบน simulator และไทยบนเครื่องจริงของเจ้าของ
+  await root.create(recursive: true);
+  await File('${root.path}/meta.json')
+      .writeAsString('{"language":"thai"}', flush: true);
 }
 
 void main() {

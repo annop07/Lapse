@@ -6,6 +6,8 @@ library;
 
 import 'package:flutter/widgets.dart';
 
+import '../../i18n/strings.dart';
+
 import '../../model/day.dart';
 import '../../model/duration_fmt.dart';
 import '../../model/thai_date.dart';
@@ -234,7 +236,7 @@ class _Header extends StatelessWidget {
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      '‹ วัน',
+                      LapseStrings.of(context).backToDay,
                       style: lapseTextStyle(
                         LapseType.label,
                         color: colors.inkMuted,
@@ -252,7 +254,7 @@ class _Header extends StatelessWidget {
                   child: Align(
                     alignment: Alignment.centerRight,
                     child: Text(
-                      'แบ่งปัน',
+                      LapseStrings.of(context).share,
                       style: lapseTextStyle(
                         LapseType.label,
                         color: colors.inkMuted,
@@ -264,12 +266,13 @@ class _Header extends StatelessWidget {
             ],
           ),
           Text(
-            handle.isEmpty ? 'กำแพง' : handle,
+            handle.isEmpty ? LapseStrings.of(context).wallLink : handle,
             style: lapseTextStyle(LapseType.title, color: colors.ink),
           ),
           SizedBox(height: LapseSpace.s2),
           Text(
-            '${totalSeconds ~/ 3600} ชั่วโมง · $daysWithTime วัน ในปี $year',
+            LapseStrings.of(context)
+                .summary(totalSeconds ~/ 3600, daysWithTime, year),
             style: lapseTextStyle(LapseType.caption, color: colors.inkMuted),
           ),
         ],
@@ -296,6 +299,7 @@ class _MonthLabels extends StatelessWidget {
   Widget build(BuildContext context) {
     final first = DateTime(year, 1, 1);
     final lead = sundayFirstWeekday(first);
+    final strings = LapseStrings.of(context);
     final style = lapseTextStyle(LapseType.micro, color: colors.inkMuted);
     final scaler = MediaQuery.textScalerOf(context);
 
@@ -303,7 +307,7 @@ class _MonthLabels extends StatelessWidget {
     var lastRight = double.negativeInfinity;
 
     for (var month = 1; month <= 12; month++) {
-      final label = thaiMonthShort(month);
+      final label = monthShort(month, thai: strings.isThai);
       final column =
           (lead + DateTime(year, month, 1).difference(first).inDays) ~/
               kWallRows;
@@ -382,7 +386,7 @@ class _Legend extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Row(
         children: [
-          Text('น้อย',
+          Text(LapseStrings.of(context).less,
               style: lapseTextStyle(LapseType.caption, color: colors.inkMuted)),
           SizedBox(width: LapseSpace.s3),
           for (final color in colors.wall)
@@ -398,7 +402,7 @@ class _Legend extends StatelessWidget {
               ),
             ),
           SizedBox(width: LapseSpace.s2),
-          Text('มาก',
+          Text(LapseStrings.of(context).more,
               style: lapseTextStyle(LapseType.caption, color: colors.inkMuted)),
         ],
       );
@@ -420,6 +424,7 @@ class _Detail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final lines = day?.lines.toList() ?? const [];
+    final strings = LapseStrings.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -431,12 +436,12 @@ class _Detail extends StatelessWidget {
         Row(
           children: [
             Text(
-              '${thaiDayAndMonth(date)} ${date.year}',
+              '${dayAndMonth(date, thai: strings.isThai)} ${date.year}',
               style: lapseTextStyle(LapseType.label, color: colors.ink),
             ),
             const Spacer(),
             Text(
-              seconds > 0 ? formatThai(seconds) : 'ไม่ได้อ่าน',
+              seconds > 0 ? formatThai(seconds) : strings.notRead,
               style: lapseTextStyle(LapseType.label, color: colors.ink2),
             ),
           ],
@@ -495,12 +500,14 @@ class _Friends extends StatelessWidget {
             margin: EdgeInsets.only(bottom: LapseSpace.s5),
           ),
           Text(
-            'ไม่มีอันดับ — เรียงตามลำดับที่เพิ่ม',
+            LapseStrings.of(context).noRanking,
             style: lapseTextStyle(LapseType.caption, color: colors.inkMuted),
           ),
           SizedBox(height: LapseSpace.s4),
           Text(
-            handle.isEmpty ? 'คุณ' : '$handle (คุณ)',
+            handle.isEmpty
+                ? LapseStrings.of(context).you
+                : '$handle (${LapseStrings.of(context).you})',
             style: lapseTextStyle(LapseType.body, color: colors.ink),
           ),
           if (onAddFriend != null)
@@ -512,7 +519,7 @@ class _Friends extends StatelessWidget {
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    '+ เพิ่มเพื่อน',
+                    LapseStrings.of(context).addFriend,
                     style: lapseTextStyle(
                       LapseType.label,
                       color: colors.inkMuted,

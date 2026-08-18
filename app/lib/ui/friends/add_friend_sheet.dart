@@ -9,6 +9,8 @@ library;
 
 import 'package:flutter/widgets.dart';
 
+import '../../i18n/strings.dart';
+
 import '../../data/lapse_server.dart';
 import '../../tokens/lapse_theme.dart';
 import '../../tokens/lapse_tokens.dart';
@@ -76,6 +78,7 @@ class _AddFriendSheetState extends State<AddFriendSheet> {
     final colors = LapseTheme.colorsOf(context);
     final inset = MediaQuery.paddingOf(context);
     final keyboard = MediaQuery.viewInsetsOf(context).bottom;
+    final strings = LapseStrings.of(context);
 
     return Stack(
       children: [
@@ -112,12 +115,12 @@ class _AddFriendSheetState extends State<AddFriendSheet> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'เพิ่มเพื่อน',
+                  strings.addFriendTitle,
                   style: lapseTextStyle(LapseType.title, color: colors.ink),
                 ),
                 SizedBox(height: LapseSpace.s3),
                 Text(
-                  'เห็นได้แค่เวลาต่อวัน สิ่งที่เขาเขียนเป็นของเขา',
+                  strings.addFriendNote,
                   style: lapseTextStyle(
                     LapseType.caption,
                     color: colors.inkMuted,
@@ -127,7 +130,7 @@ class _AddFriendSheetState extends State<AddFriendSheet> {
                 LapseTextField(
                   controller: _handle,
                   focusNode: _focus,
-                  placeholder: '@ชื่อของเขา',
+                  placeholder: strings.friendHandlePlaceholder,
                   onSubmitted: (_) => _add(),
                 ),
                 SizedBox(height: LapseSpace.s4),
@@ -146,14 +149,14 @@ class _AddFriendSheetState extends State<AddFriendSheet> {
                 Row(
                   children: [
                     _Action(
-                      label: _busy ? 'กำลังเพิ่ม' : 'เพิ่ม',
+                      label: _busy ? strings.adding : strings.add,
                       enabled: !_busy,
                       onTap: _add,
                       colors: colors,
                     ),
                     SizedBox(width: LapseSpace.s8),
                     _Action(
-                      label: 'ปิด',
+                      label: strings.close,
                       enabled: !_busy,
                       onTap: widget.onClose,
                       colors: colors,

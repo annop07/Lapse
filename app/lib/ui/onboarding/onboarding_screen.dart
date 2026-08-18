@@ -13,6 +13,8 @@ library;
 
 import 'package:flutter/widgets.dart';
 
+import '../../i18n/strings.dart';
+
 import '../../tokens/lapse_theme.dart';
 import '../../tokens/lapse_tokens.dart';
 
@@ -54,6 +56,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Widget build(BuildContext context) {
     final colors = LapseTheme.colorsOf(context);
     final inset = MediaQuery.paddingOf(context);
+    final strings = LapseStrings.of(context);
     // ต้องเผื่อความสูงคีย์บอร์ดด้วย ไม่ใช่แค่ safe area
     // ไม่งั้นปุ่มต่อไปจะอยู่ใต้คีย์บอร์ดที่เด้งขึ้นมาเองตั้งแต่วินาทีแรก
     final keyboard = MediaQuery.viewInsetsOf(context).bottom;
@@ -71,12 +74,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'วันนี้จะทำอะไร',
+              strings.onboardTitle,
               style: lapseTextStyle(LapseType.title, color: colors.ink),
             ),
             SizedBox(height: LapseSpace.s3),
             Text(
-              'เขียนสักบรรทัด แก้ทีหลังได้',
+              strings.onboardNote,
               style: lapseTextStyle(LapseType.caption, color: colors.inkMuted),
             ),
             SizedBox(height: LapseSpace.s8),
@@ -86,7 +89,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   valueListenable: _controller,
                   builder: (context, value, _) => value.text.isEmpty
                       ? Text(
-                          'อ่านเลข บทที่ 4',
+                          strings.onboardExample,
                           style: lapseTextStyle(
                             LapseType.body,
                             color: colors.inkFaint,
@@ -124,7 +127,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      'ต่อไป',
+                      strings.next,
                       style: lapseTextStyle(
                         LapseType.body,
                         color: value.text.trim().isEmpty

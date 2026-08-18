@@ -5,6 +5,8 @@ library;
 
 import 'package:flutter/widgets.dart';
 
+import '../../i18n/strings.dart';
+
 import '../../data/meta_store.dart';
 import '../../store/lapse_store.dart';
 import '../../tokens/lapse_theme.dart';
@@ -48,6 +50,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final colors = LapseTheme.colorsOf(context);
     final inset = MediaQuery.paddingOf(context);
     final meta = widget.store.meta;
+    final strings = LapseStrings.of(context);
 
     return ColoredBox(
       color: colors.surface,
@@ -62,14 +65,31 @@ class _SettingsScreenState extends State<SettingsScreen> {
         children: [
           _BackLink(onTap: widget.onClose, colors: colors),
           SizedBox(height: LapseSpace.s5),
-          _SectionLabel('ธีม', colors: colors),
-          _ThemeChoices(
+          _SectionLabel(strings.theme, colors: colors),
+          _Choices<ThemeChoice>(
             value: meta.theme,
+            options: {
+              ThemeChoice.auto: strings.themeAuto,
+              ThemeChoice.light: strings.themeLight,
+              ThemeChoice.dark: strings.themeDark,
+            },
             onChanged: widget.store.setTheme,
             colors: colors,
           ),
           _Divider(colors: colors),
-          _SectionLabel('ชื่อผู้ใช้', colors: colors),
+          _SectionLabel(strings.language, colors: colors),
+          _Choices<Language>(
+            value: meta.language,
+            options: {
+              Language.auto: strings.languageAuto,
+              Language.thai: strings.languageThai,
+              Language.english: strings.languageEnglish,
+            },
+            onChanged: widget.store.setLanguage,
+            colors: colors,
+          ),
+          _Divider(colors: colors),
+          _SectionLabel(strings.handleLabel, colors: colors),
           _HandleField(
             controller: _handle,
             onChanged: widget.store.setHandle,
@@ -77,26 +97,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           if (widget.onOpenAccount != null) ...[
             _Divider(colors: colors),
-            _SectionLabel('บัญชีและซิงก์', colors: colors),
+            _SectionLabel(strings.accountSection, colors: colors),
             _TextAction(
-              label: 'บัญชี',
-              note: 'เข้าสู่ระบบเพื่อซิงก์ข้ามเครื่องและเพิ่มเพื่อน',
+              label: strings.accountEntry,
+              note: strings.accountEntryNote,
               onTap: () async => widget.onOpenAccount!(),
               colors: colors,
             ),
           ],
           _Divider(colors: colors),
-          _SectionLabel('ข้อมูลของคุณ', colors: colors),
+          _SectionLabel(strings.yourData, colors: colors),
           _TextAction(
-            label: 'ส่งออกทั้งหมด',
-            note: 'ไฟล์ข้อความล้วน อ่านได้ด้วยตาเปล่า ฟรีเสมอ',
+            label: strings.exportAll,
+            note: strings.exportNote,
             onTap: widget.onExport,
             colors: colors,
           ),
           SizedBox(height: LapseSpace.s5),
           if (!_confirmingDelete)
             _TextAction(
-              label: 'ลบข้อมูลทั้งหมด',
+              label: strings.deleteAll,
               onTap: () async =>
                   setState(() => _confirmingDelete = true),
               colors: colors,
@@ -104,6 +124,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             )
           else
             _ConfirmDelete(
+              strings: strings,
               onCancel: () => setState(() => _confirmingDelete = false),
               onConfirm: () async {
                 await widget.store.deleteEverything();
@@ -114,7 +135,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           _Divider(colors: colors),
           Text(
-            'lapse · หนึ่งวัน หนึ่งหน้า',
+            strings.about,
             style: lapseTextStyle(LapseType.caption, color: colors.inkMuted),
           ),
         ],
@@ -138,7 +159,7 @@ class _BackLink extends StatelessWidget {
           child: Align(
             alignment: Alignment.centerLeft,
             child: Text(
-              '‹ วัน',
+              LapseStrings.of(context).backToDay,
               style: lapseTextStyle(LapseType.label, color: colors.inkMuted),
             ),
           ),
@@ -175,28 +196,26 @@ class _Divider extends StatelessWidget {
       );
 }
 
-/// ตัวเลือกธีม — ข้อความล้วน ตัวที่เลือกอยู่เข้มกว่า ไม่มีพื้นสีทึบ
-class _ThemeChoices extends StatelessWidget {
-  const _ThemeChoices({
+/// แถวตัวเลือก — ข้อความล้วน ตัวที่เลือกอยู่เข้มกว่า ไม่มีพื้นสีทึบ
+///
+/// ใช้ได้ทั้งธีมและภาษา เพราะทั้งสองอย่างคือการเลือกหนึ่งจากไม่กี่ตัวเลือก
+class _Choices<T> extends StatelessWidget {
+  const _Choices({
     required this.value,
+    required this.options,
     required this.onChanged,
     required this.colors,
   });
 
-  final ThemeChoice value;
-  final ValueChanged<ThemeChoice> onChanged;
+  final T value;
+  final Map<T, String> options;
+  final ValueChanged<T> onChanged;
   final LapseColors colors;
-
-  static const _labels = {
-    ThemeChoice.auto: 'ตามระบบ',
-    ThemeChoice.light: 'สว่าง',
-    ThemeChoice.dark: 'มืด',
-  };
 
   @override
   Widget build(BuildContext context) => Row(
         children: [
-          for (final entry in _labels.entries)
+          for (final entry in options.entries)
             GestureDetector(
               onTap: () => onChanged(entry.key),
               behavior: HitTestBehavior.opaque,
@@ -254,7 +273,7 @@ class _HandleFieldState extends State<_HandleField> {
             valueListenable: widget.controller,
             builder: (context, value, _) => value.text.isEmpty
                 ? Text(
-                    '@ยังไม่ได้ตั้ง',
+                    LapseStrings.of(context).handleUnset,
                     style: lapseTextStyle(
                       LapseType.body,
                       color: colors.inkMuted,
@@ -334,11 +353,13 @@ class _TextAction extends StatelessWidget {
 /// ยืนยันการลบในที่เดิม ไม่ใช้ modal — modal ขัดจังหวะ และระบบนี้ไม่มี
 class _ConfirmDelete extends StatelessWidget {
   const _ConfirmDelete({
+    required this.strings,
     required this.onCancel,
     required this.onConfirm,
     required this.colors,
   });
 
+  final Strings strings;
   final VoidCallback onCancel;
   final Future<void> Function() onConfirm;
   final LapseColors colors;
@@ -348,20 +369,20 @@ class _ConfirmDelete extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'ลบทุกอย่างถาวร กู้คืนไม่ได้',
+            strings.deleteConfirm,
             style: lapseTextStyle(LapseType.body, color: colors.ink),
           ),
           Row(
             children: [
               _TextAction(
-                label: 'ลบเลย',
+                label: strings.deleteYes,
                 onTap: onConfirm,
                 colors: colors,
                 danger: true,
               ),
               SizedBox(width: LapseSpace.s7),
               _TextAction(
-                label: 'ไม่ลบ',
+                label: strings.deleteNo,
                 onTap: () async => onCancel(),
                 colors: colors,
               ),

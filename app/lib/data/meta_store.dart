@@ -15,6 +15,8 @@
 library;
 
 import 'dart:convert';
+
+import '../i18n/strings.dart';
 import 'dart:io';
 
 enum ThemeChoice { auto, light, dark }
@@ -24,6 +26,7 @@ class Meta {
     this.handle = '',
     this.friends = const [],
     this.theme = ThemeChoice.auto,
+    this.language = Language.auto,
     this.createdAt,
     this.onboardedAt,
     this.firstFocusDoneAt,
@@ -35,6 +38,9 @@ class Meta {
   final List<String> friends;
 
   final ThemeChoice theme;
+
+  /// ภาษาที่ผู้ใช้เลือก · auto = ตามภาษาของเครื่อง
+  final Language language;
   final DateTime? createdAt;
 
   /// ผ่าน onboarding แล้วหรือยัง
@@ -50,6 +56,7 @@ class Meta {
     String? handle,
     List<String>? friends,
     ThemeChoice? theme,
+    Language? language,
     DateTime? createdAt,
     DateTime? onboardedAt,
     DateTime? firstFocusDoneAt,
@@ -58,6 +65,7 @@ class Meta {
         handle: handle ?? this.handle,
         friends: friends ?? this.friends,
         theme: theme ?? this.theme,
+        language: language ?? this.language,
         createdAt: createdAt ?? this.createdAt,
         onboardedAt: onboardedAt ?? this.onboardedAt,
         firstFocusDoneAt: firstFocusDoneAt ?? this.firstFocusDoneAt,
@@ -72,6 +80,11 @@ class Meta {
           'dark' => ThemeChoice.dark,
           _ => ThemeChoice.auto,
         },
+        language: switch (json['language']) {
+          'thai' => Language.thai,
+          'english' => Language.english,
+          _ => Language.auto,
+        },
         createdAt: _date(json['createdAt']),
         onboardedAt: _date(json['onboardedAt']),
         firstFocusDoneAt: _date(json['firstFocusDoneAt']),
@@ -81,6 +94,7 @@ class Meta {
         'handle': handle,
         'friends': friends,
         'theme': theme.name,
+        'language': language.name,
         if (createdAt != null) 'createdAt': _key(createdAt!),
         if (onboardedAt != null) 'onboardedAt': _key(onboardedAt!),
         if (firstFocusDoneAt != null)

@@ -14,6 +14,7 @@ import 'package:flutter/widgets.dart';
 import '../data/day_repository.dart';
 import '../data/exporter.dart';
 import '../data/meta_store.dart';
+import '../i18n/strings.dart';
 import '../model/day.dart';
 
 class LapseStore extends ChangeNotifier {
@@ -136,6 +137,9 @@ class LapseStore extends ChangeNotifier {
 
   Future<void> setTheme(ThemeChoice choice) =>
       _saveMeta(_meta.copyWith(theme: choice));
+
+  Future<void> setLanguage(Language choice) =>
+      _saveMeta(_meta.copyWith(language: choice));
 
   Future<void> setHandle(String handle) =>
       _saveMeta(_meta.copyWith(handle: handle));

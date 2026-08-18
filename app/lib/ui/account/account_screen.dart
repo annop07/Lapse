@@ -9,6 +9,8 @@ library;
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
+import '../../i18n/strings.dart';
+
 import '../../data/lapse_server.dart';
 import '../../store/lapse_store.dart';
 import '../../tokens/lapse_theme.dart';
@@ -84,6 +86,7 @@ class _AccountScreenState extends State<AccountScreen> {
   Widget build(BuildContext context) {
     final colors = LapseTheme.colorsOf(context);
     final inset = MediaQuery.paddingOf(context);
+    final strings = LapseStrings.of(context);
 
     return ColoredBox(
       color: colors.surface,
@@ -99,9 +102,9 @@ class _AccountScreenState extends State<AccountScreen> {
           _Back(onTap: widget.onClose, colors: colors),
           SizedBox(height: LapseSpace.s5),
           if (widget.server.signedIn)
-            ..._signedIn(colors)
+            ..._signedIn(colors, strings)
           else
-            ..._signedOut(colors),
+            ..._signedOut(colors, strings),
           if (_message != null) ...[
             SizedBox(height: LapseSpace.s6),
             Text(
@@ -114,34 +117,34 @@ class _AccountScreenState extends State<AccountScreen> {
     );
   }
 
-  List<Widget> _signedOut(LapseColors colors) => [
-        _Label('เข้าสู่ระบบ', colors: colors),
+  List<Widget> _signedOut(LapseColors colors, Strings strings) => [
+        _Label(strings.signIn, colors: colors),
         Text(
-          'ซิงก์ข้อมูลข้ามเครื่อง ไม่เข้าสู่ระบบก็ใช้ได้ตามปกติ',
+          strings.signInNote,
           style: lapseTextStyle(LapseType.caption, color: colors.inkMuted),
         ),
         SizedBox(height: LapseSpace.s6),
         LapseTextField(
           controller: _email,
-          placeholder: 'อีเมล',
+          placeholder: strings.email,
           keyboardType: TextInputType.emailAddress,
         ),
         _Rule(colors: colors),
         if (!_codeSent)
           _Action(
-            label: _busy ? 'กำลังส่ง' : 'ส่งรหัสไปที่อีเมล',
+            label: _busy ? strings.sending : strings.sendCode,
             enabled: !_busy && _email.text.contains('@'),
             onTap: () => _run(() async {
               await widget.server.sendCode(_email.text);
               setState(() => _codeSent = true);
-              return 'ส่งรหัสหกหลักไปที่ ${_email.text.trim()} แล้ว';
+              return strings.codeSentTo(_email.text.trim());
             }),
             colors: colors,
           )
         else ...[
           LapseTextField(
             controller: _code,
-            placeholder: 'รหัสหกหลัก',
+            placeholder: strings.codePlaceholder,
             keyboardType: TextInputType.number,
             formatters: [
               FilteringTextInputFormatter.digitsOnly,
@@ -150,7 +153,7 @@ class _AccountScreenState extends State<AccountScreen> {
           ),
           _Rule(colors: colors),
           _Action(
-            label: _busy ? 'กำลังตรวจ' : 'ยืนยัน',
+            label: _busy ? strings.verifying : strings.verify,
             enabled: !_busy && _code.text.length == 6,
             onTap: () => _run(() async {
               await widget.server.verifyCode(_email.text, _code.text);
@@ -161,11 +164,11 @@ class _AccountScreenState extends State<AccountScreen> {
             colors: colors,
           ),
           _Action(
-            label: 'ส่งรหัสใหม่',
+            label: strings.resend,
             enabled: !_busy,
             onTap: () => _run(() async {
               await widget.server.sendCode(_email.text);
-              return 'ส่งรหัสใหม่แล้ว';
+              return strings.codeSentTo(_email.text.trim());
             }),
             colors: colors,
             quiet: true,
@@ -173,28 +176,31 @@ class _AccountScreenState extends State<AccountScreen> {
         ],
       ];
 
-  List<Widget> _signedIn(LapseColors colors) => [
-        _Label('บัญชี', colors: colors),
+  List<Widget> _signedIn(LapseColors colors, Strings strings) => [
+        _Label(strings.account, colors: colors),
         Text(
           widget.server.email ?? '',
           style: lapseTextStyle(LapseType.body, color: colors.ink),
         ),
         _Rule(colors: colors),
-        _Label('ชื่อผู้ใช้', colors: colors),
+        _Label(strings.handleLabel, colors: colors),
         Text(
-          'เพื่อนใช้ชื่อนี้หาคุณเจอ · ตัวอักษรเล็ก ตัวเลข หรือขีดล่าง',
+          strings.handleForFriends,
           style: lapseTextStyle(LapseType.caption, color: colors.inkMuted),
         ),
         SizedBox(height: LapseSpace.s4),
-        LapseTextField(controller: _handle, placeholder: '@ชื่อของคุณ'),
+        LapseTextField(
+          controller: _handle,
+          placeholder: strings.handlePlaceholder,
+        ),
         _Action(
-          label: _busy ? 'กำลังบันทึก' : 'บันทึกชื่อ',
+          label: _busy ? strings.saving : strings.saveHandle,
           enabled: !_busy,
           onTap: () => _run(() async {
             final problem = await widget.server.claimHandle(_handle.text);
             if (problem == null) {
               await widget.store.setHandle(_handle.text.trim().toLowerCase());
-              return 'บันทึกแล้ว';
+              return strings.saved;
             }
             return problem;
           }),
@@ -202,7 +208,7 @@ class _AccountScreenState extends State<AccountScreen> {
         ),
         _Rule(colors: colors),
         _Action(
-          label: 'ออกจากระบบ',
+          label: strings.signOut,
           enabled: !_busy,
           onTap: () => _run(() async {
             await widget.server.signOut();
@@ -213,7 +219,7 @@ class _AccountScreenState extends State<AccountScreen> {
         ),
         SizedBox(height: LapseSpace.s3),
         Text(
-          'ข้อมูลในเครื่องยังอยู่ครบหลังออกจากระบบ',
+          strings.signOutNote,
           style: lapseTextStyle(LapseType.caption, color: colors.inkMuted),
         ),
       ];
@@ -234,7 +240,7 @@ class _Back extends StatelessWidget {
           child: Align(
             alignment: Alignment.centerLeft,
             child: Text(
-              '‹ ตั้งค่า',
+              LapseStrings.of(context).backToSettings,
               style: lapseTextStyle(LapseType.label, color: colors.inkMuted),
             ),
           ),

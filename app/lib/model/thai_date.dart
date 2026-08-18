@@ -19,6 +19,37 @@ const _weekdays = [
   'อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์',
 ];
 
+/// ตัวพิมพ์เล็กทั้งหมดตามกฎน้ำเสียงใน CLAUDE.md
+///
+/// ภาษาอังกฤษปกติเขียนชื่อเดือนกับวันด้วยตัวใหญ่ แต่กฎของโปรเจกต์นี้
+/// บอกให้ใช้ตัวเล็กกับข้อความอังกฤษทั้งหมด และการยกเว้นตรงนี้จะทำให้
+/// หัววันดังกว่าทุกอย่างอื่นบนจอในแอปที่ทั้งตัวพยายามเงียบ
+const _monthsFullEn = [
+  'january', 'february', 'march', 'april', 'may', 'june',
+  'july', 'august', 'september', 'october', 'november', 'december',
+];
+
+const _monthsShortEn = [
+  'jan', 'feb', 'mar', 'apr', 'may', 'jun',
+  'jul', 'aug', 'sep', 'oct', 'nov', 'dec',
+];
+
+const _weekdaysEn = [
+  'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday',
+];
+
+/// `18 สิงหาคม` หรือ `18 August` — บรรทัดหลักของหัววัน ไม่มีปี
+String dayAndMonth(DateTime d, {required bool thai}) =>
+    '${d.day} ${(thai ? _monthsFull : _monthsFullEn)[d.month - 1]}';
+
+/// `ส.ค.` หรือ `Aug` — ป้ายเดือนบนกำแพง
+String monthShort(int month, {required bool thai}) =>
+    (thai ? _monthsShort : _monthsShortEn)[month - 1];
+
+/// `อังคาร · 2026` หรือ `Tuesday · 2026` — บรรทัดรองของหัววัน
+String weekdayAndYear(DateTime d, {required bool thai}) =>
+    '${(thai ? _weekdays : _weekdaysEn)[sundayFirstWeekday(d)]} · ${d.year}';
+
 /// `18 สิงหาคม` — บรรทัดหลักของหัววัน ไม่มีปี
 String thaiDayAndMonth(DateTime d) => '${d.day} ${_monthsFull[d.month - 1]}';
 

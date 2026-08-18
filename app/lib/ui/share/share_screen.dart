@@ -12,6 +12,8 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
+
+import '../../i18n/strings.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../model/day.dart';
@@ -118,6 +120,7 @@ class _ShareScreenState extends State<ShareScreen> {
     final colors = LapseTheme.colorsOf(context);
     final inset = MediaQuery.paddingOf(context);
     final totalHours = _seconds.values.fold(0, (a, b) => a + b) ~/ 3600;
+    final strings = LapseStrings.of(context);
 
     return ColoredBox(
       color: colors.surface,
@@ -136,7 +139,7 @@ class _ShareScreenState extends State<ShareScreen> {
                     child: Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        '‹ กำแพง',
+                        LapseStrings.of(context).backToWall,
                         style: lapseTextStyle(
                           LapseType.label,
                           color: colors.inkMuted,
@@ -175,7 +178,7 @@ class _ShareScreenState extends State<ShareScreen> {
                 inset.bottom + LapseSpace.s7,
               ),
               child: Text(
-                _busy ? 'กำลังเตรียม' : 'แบ่งปัน',
+                _busy ? strings.preparing : strings.share,
                 style: lapseTextStyle(
                   LapseType.body,
                   color: _busy ? colors.inkMuted : colors.ink,
@@ -231,7 +234,7 @@ class _Card extends StatelessWidget {
         children: [
           const Spacer(),
           Text(
-            handle.isEmpty ? 'ปีนี้' : handle,
+            handle.isEmpty ? LapseStrings.of(context).thisYear : handle,
             style: lapseTextStyle(LapseType.title, color: colors.ink),
           ),
           SizedBox(height: LapseSpace.s7),
@@ -252,7 +255,7 @@ class _Card extends StatelessWidget {
           ),
           SizedBox(height: LapseSpace.s6),
           Text(
-            '$hours ชั่วโมง ในปี $year',
+            LapseStrings.of(context).hoursInYear(hours, year),
             style: lapseTextStyle(LapseType.mono, color: colors.ink2),
           ),
           const Spacer(),

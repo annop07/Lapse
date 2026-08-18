@@ -8,6 +8,7 @@ import 'package:flutter/widgets.dart';
 
 import 'data/lapse_server.dart';
 import 'data/meta_store.dart';
+import 'i18n/strings.dart';
 import 'model/duration_fmt.dart';
 import 'store/lapse_store.dart';
 import 'tokens/lapse_theme.dart';
@@ -55,13 +56,20 @@ class LapseApp extends StatelessWidget {
           return LapseTheme(
             colors: isDark ? LapseColors.dark : LapseColors.light,
             isDark: isDark,
-            child: MediaQuery(
-              data: MediaQuery.of(context).copyWith(
-                textScaler: clampTextScaler(MediaQuery.textScalerOf(context)),
+            child: LapseStrings(
+              strings: stringsFor(
+                store.meta.language,
+                // ภาษาของเครื่อง ไม่ใช่ของแอป — ใช้ตอนผู้ใช้เลือก "ตามระบบ"
+                WidgetsBinding.instance.platformDispatcher.locale,
               ),
-              child: Directionality(
-                textDirection: TextDirection.ltr,
-                child: _Root(store: store, server: server),
+              child: MediaQuery(
+                data: MediaQuery.of(context).copyWith(
+                  textScaler: clampTextScaler(MediaQuery.textScalerOf(context)),
+                ),
+                child: Directionality(
+                  textDirection: TextDirection.ltr,
+                  child: _Root(store: store, server: server),
+                ),
               ),
             ),
           );
@@ -87,7 +95,9 @@ class _RootState extends State<_Root> {
   /// รายการที่กำลังโฟกัสอยู่ · null แปลว่าอยู่หน้าวัน
   int? _focusedLine;
 
-  String _placeholder = kJournalPlaceholder;
+  String? _placeholder;
+
+  Strings get _strings => LapseStrings.of(context);
   String? _toast;
 
   DateTime? _seenDate;
@@ -103,9 +113,7 @@ class _RootState extends State<_Root> {
   void _onDayMaybeChanged() {
     if (widget.store.cursor == _seenDate) return;
     _seenDate = widget.store.cursor;
-    if (_placeholder != kJournalPlaceholder) {
-      setState(() => _placeholder = kJournalPlaceholder);
-    }
+    if (_placeholder != null) setState(() => _placeholder = null);
   }
 
   @override
@@ -152,8 +160,8 @@ class _RootState extends State<_Root> {
     // 4 เปลี่ยน placeholder เป็นคำถามชวนทบทวน
     setState(() {
       _placeholder = what.isEmpty
-          ? 'จำอะไรได้บ้าง — เขียนมั่วๆ ก็ได้'
-          : 'จำอะไรได้บ้างจาก “$what” — เขียนมั่วๆ ก็ได้';
+          ? _strings.recallAnything
+          : _strings.recallFrom(what);
     });
 
     // 5 เลื่อนลงไปที่ช่องบันทึกแล้วไฮไลต์ไว้สั้นๆ
@@ -216,7 +224,7 @@ class _RootState extends State<_Root> {
           store: store,
           journalController: _journal,
           journalFocus: _journalFocus,
-          journalPlaceholder: _placeholder,
+          journalPlaceholder: _placeholder ?? _strings.journalPlaceholder,
           onStartFocus: _startFocus,
           onOpenWall: _openWall,
           onOpenSettings: _openSettings,
