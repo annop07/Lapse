@@ -1,0 +1,80 @@
+/* ===========================================================
+   Lapse — Design Tokens v1.0
+   ทุกค่าเป็น role ไม่ใช่ hex ดิบ — สลับธีมที่เดียวจบ
+   =========================================================== */
+:root {
+  /* ---- Color · Light (ค่าเริ่มต้น) ---- */
+  --lp-surface:        #F4F2ED;  /* พื้นหลังหลัก — กระดาษ */
+  --lp-surface-raised: #FBFAF7;  /* แผ่นที่ยกขึ้นมา ใช้น้อยมาก */
+  --lp-ink:            #171614;  /* ข้อความหลัก        16.2:1 */
+  --lp-ink-2:          #5C5A54;  /* ข้อความรอง          6.2:1 */
+  --lp-ink-muted:      #8B877D;  /* คำอธิบาย/placeholder 3.2:1 */
+  --lp-ink-faint:      #CFCBC2;  /* ห้ามใช้กับข้อความ — ใช้กับเครื่องหมายเท่านั้น */
+  --lp-rule:           #E3E0D8;  /* เส้นคั่น 1px */
+  --lp-rule-soft:      #EEEBE4;  /* พื้นตอน hover / กำลังกดค้าง */
+  --lp-void:           #000000;  /* จอโฟกัส — ดำสนิทเท่านั้น */
+  --lp-danger:         #A33A31;  /* การทำลายข้อมูลเท่านั้น 5.9:1 */
+
+  /* ---- Wall ramp · sequential 5 ขั้น (โทนเดียว อ่อน→เข้ม) ---- */
+  --lp-wall-0: #E6E3DC;  /* ไม่ได้อ่าน */
+  --lp-wall-1: #C2BEB4;  /* < 1 ชม. */
+  --lp-wall-2: #918D83;  /* 1–2.5 ชม. */
+  --lp-wall-3: #57544D;  /* 2.5–4.3 ชม. */
+  --lp-wall-4: #1C1B18;  /* > 4.3 ชม. */
+
+  /* ---- Type ---- */
+  --lp-font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --lp-font-sans: "IBM Plex Sans Thai", "Noto Sans Thai", system-ui, -apple-system, sans-serif;
+  --lp-w-light: 300;  --lp-w-regular: 400;  --lp-w-medium: 500;
+
+  --lp-t-display: 30px;   --lp-lh-display: 1.1;   --lp-ls-display: .04em;
+  --lp-t-title:   21px;   --lp-lh-title:   1.25;  --lp-ls-title:  -.01em;
+  --lp-t-body:    14.5px; --lp-lh-body:    1.85;  --lp-ls-body:    0;
+  --lp-t-mono:    13.5px; --lp-lh-mono:    1.55;  --lp-ls-mono:    .01em;
+  --lp-t-label:   12.5px; --lp-lh-label:   1.5;   --lp-ls-label:   .02em;
+  --lp-t-caption: 11px;   --lp-lh-caption: 1.5;   --lp-ls-caption: .06em;
+  --lp-t-micro:   10px;   --lp-lh-micro:   1.4;   --lp-ls-micro:   .16em;
+
+  /* ---- Space · ฐาน 4px ---- */
+  --lp-s-1: 2px;  --lp-s-2: 4px;   --lp-s-3: 8px;   --lp-s-4: 12px;
+  --lp-s-5: 16px; --lp-s-6: 20px;  --lp-s-7: 26px;  --lp-s-8: 34px;
+  --lp-s-9: 46px; --lp-s-10: 64px;
+  --lp-gutter: 26px;      /* ระยะขอบจอ */
+  --lp-touch:  44px;      /* พื้นที่กดขั้นต่ำ */
+
+  /* ---- Radius ---- */
+  --lp-r-cell: 2px;   --lp-r-box: 3px;   --lp-r-row: 5px;
+  --lp-r-pill: 20px;  --lp-r-device: 46px;
+
+  /* ---- Border ---- */
+  --lp-hairline: 1px;
+  --lp-stroke:   1.5px;   /* checkbox, outline ของช่องที่เลือก */
+
+  /* ---- Motion ---- */
+  --lp-d-quick: 180ms;  --lp-d-base: 320ms;   --lp-d-hold: 560ms;
+  --lp-d-end:   720ms;  --lp-d-fade: 1200ms;
+  --lp-e-out:   cubic-bezier(.2,.7,.3,1);
+  --lp-e-linear: linear;  /* ใช้กับแถบกดค้างเสมอ — มันคือความจริงของเวลา */
+
+  /* ---- Elevation ---- */
+  --lp-shadow: none;  /* ระบบนี้ไม่มีเงา ระดับชั้นสร้างด้วยเส้นและพื้นเท่านั้น */
+}
+
+[data-theme="dark"] {
+  --lp-surface:        #151513;
+  --lp-surface-raised: #1C1B19;
+  --lp-ink:            #F2F0EA;  /* 16.0:1 */
+  --lp-ink-2:          #A8A49A;  /*  7.4:1 */
+  --lp-ink-muted:      #6B675F;  /*  3.3:1 */
+  --lp-ink-faint:      #43413D;
+  --lp-rule:           #2B2A27;
+  --lp-rule-soft:      #232220;
+  --lp-void:           #000000;
+  --lp-danger:         #E07A6E;  /*  6.3:1 */
+
+  --lp-wall-0: #242320;
+  --lp-wall-1: #454340;
+  --lp-wall-2: #6F6C65;
+  --lp-wall-3: #A8A49A;
+  --lp-wall-4: #F0EEE8;
+}

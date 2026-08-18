@@ -1,0 +1,494 @@
+<!doctype html>
+<html lang="th" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lapse — prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Thai:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --page-bg:#12110f; --page-ink:#a8a49a; --page-ink-2:#6e6a62;
+  --paper:#f4f2ed; --surface:#fbfaf7; --ink:#171614; --ink-2:#5c5a54; --ink-3:#a39f95;
+  --rule:#e3e0d8; --rule-soft:#eeebe4; --void:#000;
+  --w0:#e6e3dc; --w1:#c2beb4; --w2:#918d83; --w3:#57544d; --w4:#1c1b18;
+  --accent:#171614;
+}
+html[data-theme="dark"]{
+  --page-bg:#0a0a09; --page-ink:#8a877f; --page-ink-2:#5a5852;
+  --paper:#151513; --surface:#1c1b19; --ink:#f2f0ea; --ink-2:#a8a49a; --ink-3:#6b675f;
+  --rule:#2b2a27; --rule-soft:#232220; --void:#000;
+  --w0:#242320; --w1:#454340; --w2:#6f6c65; --w3:#a8a49a; --w4:#f0eee8;
+  --accent:#f2f0ea;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{
+  margin:0; background:var(--page-bg); color:var(--page-ink);
+  font-family:"IBM Plex Sans Thai","Noto Sans Thai",system-ui,-apple-system,sans-serif;
+  font-weight:300; padding:32px 20px 60px; display:flex; flex-direction:column; align-items:center;
+}
+.page-head{max-width:800px;width:100%;margin:0 auto 30px;display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap}
+.page-head h1{font-family:"IBM Plex Mono",monospace;font-size:13px;font-weight:400;letter-spacing:.14em;text-transform:uppercase;margin:0;color:var(--page-ink)}
+.page-head p{margin:6px 0 0;font-size:12.5px;line-height:1.6;color:var(--page-ink-2);max-width:52ch}
+.tgl{background:none;border:1px solid #33322e;color:var(--page-ink);font:400 11px/1 "IBM Plex Mono",monospace;letter-spacing:.1em;padding:8px 12px;border-radius:20px;cursor:pointer}
+.tgl:hover{border-color:#55534d}
+.stage{display:flex;gap:34px;flex-wrap:wrap;justify-content:center;align-items:flex-start}
+figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:12px}
+figcaption{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.1em;color:var(--page-ink-2);text-transform:uppercase}
+
+/* ---------- device ---------- */
+.device{
+  width:390px;height:800px;border-radius:46px;background:var(--paper);
+  border:1px solid rgba(255,255,255,.07); box-shadow:0 0 0 9px #1e1d1a,0 26px 60px rgba(0,0,0,.55);
+  overflow:hidden;position:relative;
+}
+.screen{position:absolute;inset:0;overflow:hidden;color:var(--ink)}
+.app{position:absolute;inset:0;display:flex;flex-direction:column}
+.statusbar{height:46px;flex:none;display:flex;align-items:flex-end;justify-content:space-between;padding:0 30px 4px;
+  font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--ink-3);letter-spacing:.04em}
+.mark{font-size:10px;letter-spacing:.3em;color:#cfcbc2;text-transform:lowercase}
+html[data-theme="dark"] .mark{color:#43413d}
+.view{position:absolute;inset:0;top:46px;display:none;flex-direction:column}
+.app[data-screen="day"] .view-day{display:flex}
+.app[data-screen="wall"] .view-wall{display:flex}
+
+/* ---------- day ---------- */
+.d-top{flex:none;padding:2px 26px 0;display:flex;justify-content:flex-end}
+.to-wall{background:none;border:0;padding:6px 0;cursor:pointer;color:var(--ink-3);
+  font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase}
+.to-wall:hover{color:var(--ink-2)}
+.d-head{flex:none;display:flex;align-items:center;gap:10px;padding:10px 26px 18px}
+.nav{background:none;border:0;color:var(--ink-3);font-size:19px;line-height:1;cursor:pointer;padding:8px 6px;font-family:"IBM Plex Mono",monospace}
+.nav:hover{color:var(--ink)}
+.date{flex:1;text-align:center}
+.d-main{display:block;font-size:21px;font-weight:400;letter-spacing:-.01em}
+.d-sub{display:block;margin-top:3px;font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--ink-3);letter-spacing:.1em}
+.d-body{flex:1;overflow-y:auto;padding:0 26px 8px;touch-action:pan-y;display:flex;flex-direction:column}
+.d-body::-webkit-scrollbar{width:0}
+.lines{list-style:none;margin:0;padding:0;flex:none}
+.line{position:relative;display:flex;align-items:flex-start;gap:10px;padding:9px 8px 9px 0;cursor:pointer;
+  font-family:"IBM Plex Mono",monospace;font-size:13.5px;line-height:1.55;overflow:hidden;border-radius:5px}
+.line .hold-fill{position:absolute;left:-6px;top:0;bottom:0;width:0;background:var(--rule-soft);border-radius:5px;z-index:0}
+.line.holding .hold-fill{width:calc(100% + 12px);transition:width .55s linear}
+.line > *{position:relative;z-index:1}
+.box{flex:none;width:15px;height:15px;margin-top:3px;border:1.5px solid var(--ink-3);border-radius:3px;background:none;cursor:pointer;padding:0;
+  display:flex;align-items:center;justify-content:center}
+.box:hover{border-color:var(--ink)}
+.box.on{background:var(--ink);border-color:var(--ink)}
+.box.on::after{content:"";width:7px;height:4px;border-left:1.6px solid var(--paper);border-bottom:1.6px solid var(--paper);transform:rotate(-45deg) translate(1px,-1px)}
+.txt{flex:1;font-family:"IBM Plex Sans Thai","Noto Sans Thai",sans-serif;font-size:14.5px;outline:none;min-width:20px;padding:1px 2px;border-radius:3px}
+.txt:focus{background:var(--rule-soft)}
+.line.done .txt{color:var(--ink-3)}
+.tm{flex:none;font-size:12.5px;color:var(--ink-2);font-variant-numeric:tabular-nums;padding-top:2px;letter-spacing:.02em}
+.tm.zero{color:#cfcbc2}
+.add{flex:none;align-self:flex-start;margin:4px 0 0;background:none;border:0;cursor:pointer;color:var(--ink-3);font-family:"IBM Plex Mono",monospace;font-size:12.5px;padding:8px 0}
+.add:hover{color:var(--ink-2)}
+.rule{flex:none;margin:20px 0 14px;color:var(--ink-3);font-family:"IBM Plex Mono",monospace;font-size:13px;letter-spacing:.3em}
+.journal{width:100%;flex:1;min-height:150px;border:0;background:none;resize:none;outline:none;color:var(--ink);
+  font-family:"IBM Plex Sans Thai","Noto Sans Thai",sans-serif;font-weight:300;font-size:14.5px;line-height:1.85;padding:0}
+.journal::placeholder{color:#cfcbc2}
+.journal.lit{animation:lit 1.4s ease-out}
+@keyframes lit{0%{background:var(--rule-soft)}100%{background:transparent}}
+.d-foot{flex:none;padding:12px 26px 26px;display:flex;justify-content:space-between;align-items:center;
+  font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.08em;color:#c3bfb6}
+.toast{position:absolute;left:50%;bottom:78px;transform:translate(-50%,8px);background:var(--ink);color:var(--paper);
+  font-family:"IBM Plex Mono",monospace;font-size:11.5px;padding:8px 15px;border-radius:20px;opacity:0;pointer-events:none;
+  transition:opacity .3s,transform .3s;z-index:40}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* ---------- wall ---------- */
+.w-top{flex:none;padding:2px 26px 0}
+.back{background:none;border:0;padding:6px 0;cursor:pointer;color:var(--ink-3);
+  font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase}
+.back:hover{color:var(--ink-2)}
+.w-body{flex:1;overflow-y:auto;padding:14px 26px 26px}
+.w-body::-webkit-scrollbar{width:0}
+.who{display:flex;align-items:baseline;gap:10px;margin-bottom:2px}
+.who h2{margin:0;font-family:"IBM Plex Mono",monospace;font-size:15px;font-weight:500;letter-spacing:.01em}
+.who .yr{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--ink-3);letter-spacing:.1em}
+.tot{font-size:12.5px;color:var(--ink-2);margin:0 0 18px;font-variant-numeric:tabular-nums}
+.months{display:grid;grid-auto-flow:column;grid-auto-columns:9px;height:13px;margin-bottom:3px}
+.months span{font-family:"IBM Plex Mono",monospace;font-size:9px;color:var(--ink-3);white-space:nowrap;overflow:visible;letter-spacing:.04em}
+.grid{display:grid;grid-auto-flow:column;grid-auto-columns:7px;grid-template-rows:repeat(7,7px);gap:2px}
+.cell{width:7px;height:7px;border-radius:1.5px;background:var(--w0);cursor:pointer}
+.cell.l1{background:var(--w1)}.cell.l2{background:var(--w2)}.cell.l3{background:var(--w3)}.cell.l4{background:var(--w4)}
+.cell.void{background:none;cursor:default}
+.cell.sel{outline:1.5px solid var(--accent);outline-offset:1.5px}
+.legend{display:flex;align-items:center;gap:5px;margin-top:12px;font-family:"IBM Plex Mono",monospace;font-size:9.5px;color:var(--ink-3)}
+.legend i{width:7px;height:7px;border-radius:1.5px;display:block}
+.detail{margin-top:16px;border-top:1px solid var(--rule);padding-top:14px;min-height:74px}
+.detail .dd{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--ink-3);letter-spacing:.06em}
+.detail .dv{font-size:15px;margin-top:5px;font-variant-numeric:tabular-nums}
+.detail ul{list-style:none;margin:9px 0 0;padding:0;font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--ink-2);line-height:1.85}
+.detail .priv{margin-top:9px;font-size:11.5px;color:var(--ink-3);line-height:1.6}
+.friends{margin-top:26px;border-top:1px solid var(--rule);padding-top:16px}
+.fh{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin-bottom:14px}
+.fh em{font-style:normal;text-transform:none;letter-spacing:.02em;display:block;margin-top:4px;font-size:10px;color:#c3bfb6}
+.frow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 0;cursor:pointer;border-radius:5px}
+.frow:hover{background:var(--rule-soft)}
+.frow .fn{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--ink-2)}
+.frow.on .fn{color:var(--ink)}
+.strip{display:grid;grid-auto-flow:column;grid-auto-columns:6px;gap:2px}
+.strip i{height:6px;border-radius:1.5px;background:var(--w0);display:block}
+.strip i.l1{background:var(--w1)}.strip i.l2{background:var(--w2)}.strip i.l3{background:var(--w3)}.strip i.l4{background:var(--w4)}
+
+/* ---------- focus ---------- */
+.focus{position:absolute;inset:0;background:var(--void);z-index:60;display:none;align-items:center;justify-content:center;
+  flex-direction:column;cursor:pointer;touch-action:none}
+.focus.on{display:flex}
+.focus .hint{color:#2e2e2e;font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.14em;text-align:center;line-height:2;
+  transition:opacity 1.2s;position:absolute;bottom:70px;left:0;right:0}
+.focus.started .hint{opacity:0}
+.focus .peek{color:#3a3a3a;font-family:"IBM Plex Mono",monospace;font-size:30px;font-weight:400;letter-spacing:.04em;
+  opacity:0;transition:opacity .5s;font-variant-numeric:tabular-nums}
+.focus .peek.show{opacity:1}
+.focus .what{position:absolute;top:64px;left:0;right:0;text-align:center;color:#242424;font-size:12px;
+  font-family:"IBM Plex Sans Thai",sans-serif;transition:opacity 1.2s}
+.focus.started .what{opacity:0}
+.focus .endfill{position:absolute;left:0;bottom:0;height:2px;width:0;background:#4a4a4a}
+.focus.ending .endfill{width:100%;transition:width .7s linear}
+
+@media (max-width:880px){ .stage{gap:24px} .device{transform:scale(.86);transform-origin:top center;margin-bottom:-110px} }
+</style>
+</head>
+<body>
+
+<div class="page-head">
+  <div>
+    <h1>Lapse — prototype v0.1</h1>
+    <p>สองหน้าจอ · หน้าวัน (todo + จับเวลา + บันทึก) และ กำแพง (สถิติสะสม + เพื่อน) — กดค้างที่บรรทัดเพื่อเริ่มจับเวลา เวลาในโหมดสาธิตเดินเร็ว 60 เท่า</p>
+  </div>
+  <button class="tgl" id="tgl">DARK</button>
+</div>
+
+<div class="stage">
+  <figure><div class="device"><div class="screen" id="appA"></div></div><figcaption>1 — วัน</figcaption></figure>
+  <figure><div class="device"><div class="screen" id="appB"></div></div><figcaption>2 — กำแพง</figcaption></figure>
+</div>
+
+<script>
+/* ================= data ================= */
+const SPEED = 60;
+const TODAY = "2026-08-18";
+const MON = ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
+const MONF = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+const DOW = ["อาทิตย์","จันทร์","อังคาร","พุธ","พฤหัสบดี","ศุกร์","เสาร์"];
+const PH_DEFAULT = "วันนี้เป็นยังไงบ้าง";
+
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;}}
+const key = d => d.toISOString().slice(0,10);
+const parse = s => new Date(s+"T00:00:00Z");
+const addDays = (d,n) => new Date(d.getTime()+n*86400000);
+
+const SUBJ = ["อ่านเลข","ท่องศัพท์","สรุปฟิสิกส์","ทำข้อสอบเก่า","ชีววิทยา บทที่ 7","เคมี อินทรีย์","อ่านสังคม","ทบทวนเลข","ฝึกอ่าน passage","สรุปฟิสิกส์ คลื่น"];
+
+function genMinutes(seed, from, to){
+  const r = mulberry32(seed); const out = {};
+  for(let d=parse(from); d<=parse(to); d=addDays(d,1)){
+    const dow = d.getUTCDay(); const roll = r();
+    let m = 0;
+    const slump = d.getUTCMonth()===4 || d.getUTCMonth()===5;
+    const off = slump ? .48 : .18;
+    if(roll > off){
+      const base = (dow===0||dow===6) ? 150 : 95;
+      m = Math.round(base * (0.35 + r()*1.5));
+      if(r() > .93) m += 120;
+    }
+    out[key(d)] = m;
+  }
+  return out;
+}
+
+function lvl(m){ if(!m) return 0; if(m<60) return 1; if(m<150) return 2; if(m<260) return 3; return 4; }
+function fmt(sec){ const m=Math.round(sec/60); const h=Math.floor(m/60); return h+":"+String(m%60).padStart(2,"0"); }
+function fmtM(m){ const h=Math.floor(m/60); return h+":"+String(Math.round(m%60)).padStart(2,"0"); }
+
+const store = {
+  minutes: genMinutes(7, "2025-12-28", TODAY),
+  days: {},
+  subs: [],
+  emit(){ this.subs.forEach(f=>f()); }
+};
+store.days[TODAY] = {
+  items:[ {t:"อ่านเลข บทที่ 4", done:true, sec:107*60},
+          {t:"ท่องศัพท์ 50 คำ", done:true, sec:32*60},
+          {t:"สรุปฟิสิกส์", done:false, sec:0} ],
+  journal:"เช้าสมาธิดีมาก บ่ายไม่ไหวเลย\nพรุ่งนี้ย้ายฟิสิกส์มาไว้เช้า"
+};
+store.minutes[TODAY] = 139;
+(function seedPast(){
+  const r = mulberry32(99);
+  for(const k in store.minutes){
+    if(k===TODAY) continue;
+    const m = store.minutes[k]; if(!m) continue;
+    let left = m; const items=[];
+    while(left > 12 && items.length < 4){
+      const take = items.length===3 ? left : Math.max(15, Math.round(left*(0.3+r()*0.5)));
+      const s = Math.min(left, take); left -= s;
+      items.push({t:SUBJ[Math.floor(r()*SUBJ.length)], done:true, sec:s*60});
+    }
+    store.days[k] = {items, journal:""};
+  }
+})();
+
+const FRIENDS = [
+  {h:"@ploy",  seed:21}, {h:"@nine", seed:34}, {h:"@bam", seed:55},
+  {h:"@teee",  seed:88}, {h:"@mook", seed:13}
+];
+FRIENDS.forEach(f => f.minutes = genMinutes(f.seed, "2025-12-28", TODAY));
+const ME = {h:"@jan", minutes:store.minutes, self:true};
+
+/* ================= template ================= */
+const TPL = `
+<div class="app" data-screen="day">
+  <div class="statusbar"><span>21:04</span><span class="mark">lapse</span></div>
+
+  <section class="view view-day">
+    <div class="d-top"><button class="to-wall">กำแพง</button></div>
+    <div class="d-head">
+      <button class="nav prev">‹</button>
+      <div class="date"><span class="d-main"></span><span class="d-sub"></span></div>
+      <button class="nav next">›</button>
+    </div>
+    <div class="d-body">
+      <ul class="lines"></ul>
+      <button class="add">+ บรรทัดใหม่</button>
+      <div class="rule">———</div>
+      <textarea class="journal" placeholder="วันนี้เป็นยังไงบ้าง"></textarea>
+    </div>
+    <div class="d-foot"><span>กดค้างที่บรรทัด → เริ่มจับเวลา</span><span class="dtot"></span></div>
+    <div class="toast"></div>
+  </section>
+
+  <section class="view view-wall">
+    <div class="w-top"><button class="back">‹ วัน</button></div>
+    <div class="w-body">
+      <div class="who"><h2 class="whoh"></h2><span class="yr">2026</span></div>
+      <p class="tot"></p>
+      <div class="months"></div>
+      <div class="grid"></div>
+      <div class="legend"><span>น้อย</span><i style="background:var(--w0)"></i><i style="background:var(--w1)"></i><i style="background:var(--w2)"></i><i style="background:var(--w3)"></i><i style="background:var(--w4)"></i><span>มาก</span></div>
+      <div class="detail"><div class="dd">แตะที่ช่องเพื่อดูรายละเอียด</div></div>
+      <div class="friends">
+        <div class="fh">เพื่อน · 5<em>ไม่มีอันดับ — เรียงตามลำดับที่เพิ่ม</em></div>
+        <div class="flist"></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="focus">
+    <div class="what"></div>
+    <div class="peek">0:00</div>
+    <div class="hint">แตะเพื่อดูเวลา<br>กดค้างเพื่อจบ</div>
+    <div class="endfill"></div>
+  </div>
+</div>`;
+
+/* ================= app ================= */
+function mount(el, screen){
+  el.innerHTML = TPL;
+  const $ = s => el.querySelector(s);
+  const app = $(".app");
+  app.dataset.screen = screen;
+
+  let cur = TODAY;
+  let wallWho = ME;
+  let selCell = null;
+
+  /* ---- day ---- */
+  function renderDay(){
+    const d = parse(cur);
+    $(".d-main").textContent = d.getUTCDate()+" "+MONF[d.getUTCMonth()];
+    $(".d-sub").textContent = DOW[d.getUTCDay()]+" · "+d.getUTCFullYear();
+    const day = store.days[cur] || (store.days[cur] = {items:[],journal:""});
+    const ul = $(".lines"); ul.innerHTML = "";
+    day.items.forEach((it,i)=>{
+      const li = document.createElement("li");
+      li.className = "line" + (it.done ? " done" : "");
+      li.innerHTML = `<span class="hold-fill"></span>
+        <button class="box${it.done?" on":""}"></button>
+        <span class="txt" contenteditable="true"></span>
+        <span class="tm${it.sec?"":" zero"}">${it.sec?fmt(it.sec):"—"}</span>`;
+      li.querySelector(".txt").textContent = it.t;
+      li.querySelector(".box").onclick = e => { e.stopPropagation(); it.done=!it.done; store.emit(); };
+      li.querySelector(".txt").addEventListener("blur", e => { it.t = e.target.textContent.trim(); });
+      li.querySelector(".txt").addEventListener("keydown", e => { if(e.key==="Enter"){e.preventDefault();e.target.blur();} });
+      attachHold(li, ()=>startFocus(i), e => e.target.classList.contains("txt") && document.activeElement === e.target);
+      ul.appendChild(li);
+    });
+    $(".journal").value = day.journal;
+    const tot = day.items.reduce((a,b)=>a+b.sec,0);
+    $(".dtot").textContent = tot ? fmt(tot) : "";
+  }
+  $(".journal").addEventListener("input", e => { (store.days[cur]).journal = e.target.value; });
+  $(".add").onclick = () => {
+    store.days[cur].items.push({t:"", done:false, sec:0});
+    renderDay();
+    const ls = el.querySelectorAll(".txt"); ls[ls.length-1].focus();
+  };
+  $(".prev").onclick = () => { cur = key(addDays(parse(cur),-1)); $(".journal").placeholder = PH_DEFAULT; renderDay(); };
+  $(".next").onclick = () => { if(cur < TODAY){ cur = key(addDays(parse(cur),1)); $(".journal").placeholder = PH_DEFAULT; renderDay(); } };
+  $(".to-wall").onclick = () => { app.dataset.screen = "wall"; renderWall(); };
+  $(".back").onclick = () => { app.dataset.screen = "day"; };
+
+  function toast(msg){
+    const t = $(".toast"); t.textContent = msg; t.classList.add("show");
+    setTimeout(()=>t.classList.remove("show"), 2200);
+  }
+
+  /* ---- hold gesture ---- */
+  function attachHold(node, fire, skip){
+    let tid=null, sx=0, sy=0, moved=false;
+    node.addEventListener("pointerdown", e => {
+      if(skip && skip(e)) return;
+      sx=e.clientX; sy=e.clientY; moved=false;
+      node.classList.add("holding");
+      tid = setTimeout(()=>{ node.classList.remove("holding"); tid=null; if(!moved) fire(); }, 560);
+    });
+    const cancel = () => { if(tid){clearTimeout(tid);tid=null;} node.classList.remove("holding"); };
+    node.addEventListener("pointermove", e => { if(Math.abs(e.clientX-sx)>8||Math.abs(e.clientY-sy)>8){moved=true;cancel();} });
+    node.addEventListener("pointerup", cancel);
+    node.addEventListener("pointerleave", cancel);
+    node.addEventListener("pointercancel", cancel);
+  }
+
+  /* ---- focus mode ---- */
+  let fTimer=null, fStart=0, fIdx=-1, fEndT=null;
+  const fx = $(".focus");
+  function startFocus(i){
+    if(document.activeElement && document.activeElement.blur) document.activeElement.blur();
+    if(window.getSelection) window.getSelection().removeAllRanges();
+    fIdx = i; fStart = Date.now();
+    const it = store.days[cur].items[i];
+    $(".what").textContent = it.t || "ไม่มีชื่อ";
+    fx.classList.add("on"); fx.classList.remove("started");
+    setTimeout(()=>fx.classList.add("started"), 2600);
+  }
+  fx.addEventListener("pointerdown", () => {
+    fx.classList.add("ending");
+    fEndT = setTimeout(()=>{ fEndT=null; endFocus(); }, 720);
+  });
+  const abortEnd = () => { if(fEndT){ clearTimeout(fEndT); fEndT=null; peek(); } fx.classList.remove("ending"); };
+  fx.addEventListener("pointerup", abortEnd);
+  fx.addEventListener("pointerleave", () => { if(fEndT){clearTimeout(fEndT);fEndT=null;} fx.classList.remove("ending"); });
+  function peek(){
+    const p = $(".peek");
+    p.textContent = fmt((Date.now()-fStart)/1000*SPEED);
+    p.classList.add("show");
+    clearTimeout(fTimer); fTimer = setTimeout(()=>p.classList.remove("show"), 1800);
+  }
+  function endFocus(){
+    fx.classList.remove("on","ending","started");
+    $(".peek").classList.remove("show");
+    const sec = Math.round((Date.now()-fStart)/1000*SPEED);
+    let what = "";
+    if(fIdx>-1 && sec>5){
+      const it = store.days[cur].items[fIdx];
+      it.sec += sec; what = it.t;
+      store.minutes[cur] = (store.minutes[cur]||0) + Math.round(sec/60);
+      toast("+ "+Math.round(sec/60)+" นาที");
+    }
+    fIdx=-1; store.emit();
+    if(sec>5) blurt(what);
+  }
+
+  /* จบ session แล้วเด้งลงช่องบันทึกทันที (blurting / active recall) */
+  function blurt(what){
+    const j = $(".journal");
+    j.placeholder = what ? ("จำอะไรได้บ้างจาก “"+what+"” — เขียนมั่วๆ ก็ได้")
+                         : "จำอะไรได้บ้าง — เขียนมั่วๆ ก็ได้";
+    if(j.value && !j.value.endsWith("\n")){
+      j.value += "\n"; store.days[cur].journal = j.value;
+    }
+    j.classList.add("lit");
+    setTimeout(()=>j.classList.remove("lit"), 1400);
+    $(".d-body").scrollTo({top:$(".d-body").scrollHeight, behavior:"smooth"});
+    setTimeout(()=>{ j.focus(); j.setSelectionRange(j.value.length, j.value.length); }, 340);
+  }
+
+  /* ---- wall ---- */
+  function renderWall(){
+    const who = wallWho;
+    $(".whoh").textContent = who.h;
+    const mins = who.minutes;
+    const total = Object.entries(mins).filter(([k])=>k>="2026-01-01").reduce((a,[,v])=>a+v,0);
+    const days = Object.entries(mins).filter(([k,v])=>k>="2026-01-01"&&v>0).length;
+    $(".tot").textContent = Math.round(total/60).toLocaleString()+" ชั่วโมง · "+days+" วัน ในปีนี้";
+
+    const start = parse("2025-12-28");
+    const end = parse(TODAY);
+    const cols = Math.ceil((end-start)/86400000/7);
+    const g = $(".grid"); g.innerHTML = "";
+    const mrow = $(".months"); mrow.innerHTML = "";
+    let lastMon = -1, lastLabCol = -99;
+    for(let c=0;c<=cols;c++){
+      const first = addDays(start, c*7);
+      const lab = document.createElement("span");
+      if(first.getUTCMonth()!==lastMon && first<=end){
+        lastMon = first.getUTCMonth();
+        if(first.getUTCFullYear() >= 2026 && c - lastLabCol >= 3){ lab.textContent = MON[lastMon]; lastLabCol = c; }
+      }
+      mrow.appendChild(lab);
+      for(let r=0;r<7;r++){
+        const d = addDays(start, c*7+r);
+        const cell = document.createElement("div");
+        if(d>end){ cell.className="cell void"; }
+        else{
+          const k = key(d); const m = mins[k]||0;
+          cell.className = "cell l"+lvl(m);
+          cell.dataset.k = k;
+          cell.onclick = () => showDetail(k, m, cell);
+        }
+        g.appendChild(cell);
+      }
+    }
+    selCell = null;
+    $(".detail").innerHTML = '<div class="dd">แตะที่ช่องเพื่อดูรายละเอียด</div>';
+
+    const fl = $(".flist"); fl.innerHTML = "";
+    [ME, ...FRIENDS].forEach(p => {
+      const row = document.createElement("div");
+      row.className = "frow" + (p===who ? " on" : "");
+      const strip = document.createElement("div"); strip.className = "strip";
+      for(let i=29;i>=0;i--){
+        const k = key(addDays(end,-i)); const i2 = document.createElement("i");
+        i2.className = "l"+lvl(p.minutes[k]||0); strip.appendChild(i2);
+      }
+      const n = document.createElement("span"); n.className="fn"; n.textContent = p.self ? p.h+" (คุณ)" : p.h;
+      row.appendChild(n); row.appendChild(strip);
+      row.onclick = () => { wallWho = p; renderWall(); };
+      fl.appendChild(row);
+    });
+  }
+
+  function showDetail(k, m, cell){
+    if(selCell) selCell.classList.remove("sel");
+    selCell = cell; cell.classList.add("sel");
+    const d = parse(k);
+    const head = d.getUTCDate()+" "+MON[d.getUTCMonth()]+" "+d.getUTCFullYear();
+    let html = `<div class="dd">${head}</div><div class="dv">${m ? fmtM(m)+" ชั่วโมง" : "ไม่ได้อ่าน"}</div>`;
+    if(wallWho.self){
+      const day = store.days[k];
+      if(day && day.items.length) html += "<ul>"+day.items.map(i=>`<li>${i.t||"—"} · ${fmt(i.sec)}</li>`).join("")+"</ul>";
+    }else{
+      html += `<div class="priv">เห็นได้แค่เวลา — สิ่งที่เขาเขียนเป็นของเขา</div>`;
+    }
+    $(".detail").innerHTML = html;
+  }
+
+  store.subs.push(() => { renderDay(); if(app.dataset.screen==="wall") renderWall(); });
+  renderDay(); renderWall();
+}
+
+mount(document.getElementById("appA"), "day");
+mount(document.getElementById("appB"), "wall");
+
+document.getElementById("tgl").onclick = e => {
+  const dark = document.documentElement.dataset.theme === "dark";
+  document.documentElement.dataset.theme = dark ? "light" : "dark";
+  e.target.textContent = dark ? "DARK" : "LIGHT";
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="th" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lapse — Design System v1.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Thai:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ============ TOKENS ============ */
+:root{
+  --lp-surface:#F4F2ED; --lp-surface-raised:#FBFAF7;
+  --lp-ink:#171614; --lp-ink-2:#5C5A54; --lp-ink-muted:#8B877D; --lp-ink-faint:#CFCBC2;
+  --lp-rule:#E3E0D8; --lp-rule-soft:#EEEBE4; --lp-void:#000; --lp-danger:#A33A31;
+  --lp-wall-0:#E6E3DC; --lp-wall-1:#C2BEB4; --lp-wall-2:#918D83; --lp-wall-3:#57544D; --lp-wall-4:#1C1B18;
+  --lp-font-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --lp-font-sans:"IBM Plex Sans Thai","Noto Sans Thai",system-ui,-apple-system,sans-serif;
+  --lp-gutter:26px;
+  --lp-r-cell:2px; --lp-r-box:3px; --lp-r-row:5px; --lp-r-pill:20px;
+  --lp-d-quick:180ms; --lp-d-base:320ms; --lp-d-hold:560ms; --lp-d-end:720ms; --lp-d-fade:1200ms;
+  --lp-e-out:cubic-bezier(.2,.7,.3,1);
+}
+[data-theme="dark"]{
+  --lp-surface:#151513; --lp-surface-raised:#1C1B19;
+  --lp-ink:#F2F0EA; --lp-ink-2:#A8A49A; --lp-ink-muted:#6B675F; --lp-ink-faint:#43413D;
+  --lp-rule:#2B2A27; --lp-rule-soft:#232220; --lp-danger:#E07A6E;
+  --lp-wall-0:#242320; --lp-wall-1:#454340; --lp-wall-2:#6F6C65; --lp-wall-3:#A8A49A; --lp-wall-4:#F0EEE8;
+}
+/* ============ PAGE ============ */
+*{box-sizing:border-box}
+body{margin:0;background:var(--lp-surface);color:var(--lp-ink);
+  font-family:var(--lp-font-sans);font-weight:300;font-size:14.5px;line-height:1.85;
+  transition:background var(--lp-d-base),color var(--lp-d-base)}
+.wrap{max-width:900px;margin:0 auto;padding:56px 32px 120px}
+code,.mono{font-family:var(--lp-font-mono)}
+hr{border:0;border-top:1px solid var(--lp-rule);margin:0}
+
+/* masthead */
+.mast{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;flex-wrap:wrap;
+  padding-bottom:34px;border-bottom:1px solid var(--lp-rule)}
+.mast h1{font-family:var(--lp-font-mono);font-size:30px;font-weight:400;letter-spacing:.04em;margin:0}
+.mast .sub{font-family:var(--lp-font-mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--lp-ink-muted);margin-top:8px}
+.tgl{background:none;border:1px solid var(--lp-rule);color:var(--lp-ink-2);cursor:pointer;
+  font-family:var(--lp-font-mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  padding:9px 15px;border-radius:var(--lp-r-pill);transition:border-color var(--lp-d-quick)}
+.tgl:hover{border-color:var(--lp-ink-muted)}
+
+/* toc */
+.toc{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:2px 20px;
+  padding:24px 0 0;font-family:var(--lp-font-mono);font-size:12.5px}
+.toc a{color:var(--lp-ink-2);text-decoration:none;padding:3px 0;display:block}
+.toc a:hover{color:var(--lp-ink)}
+.toc a b{color:var(--lp-ink-muted);font-weight:400;margin-right:9px}
+
+section{padding-top:64px}
+h2{font-family:var(--lp-font-mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--lp-ink-muted);font-weight:400;margin:0 0 6px}
+h2 + .lede{font-size:21px;line-height:1.35;letter-spacing:-.01em;margin:0 0 4px;font-weight:400}
+.note{color:var(--lp-ink-2);max-width:66ch;margin:14px 0 0}
+h3{font-family:var(--lp-font-mono);font-size:12.5px;font-weight:500;letter-spacing:.02em;
+  margin:40px 0 12px;color:var(--lp-ink)}
+.rulebox{border-left:1px solid var(--lp-ink);padding:2px 0 2px 18px;margin:22px 0;
+  color:var(--lp-ink);max-width:64ch}
+.rulebox b{font-weight:500}
+
+/* principles */
+.pr{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1px;
+  background:var(--lp-rule);border:1px solid var(--lp-rule);margin-top:26px}
+.pr > div{background:var(--lp-surface);padding:22px 20px}
+.pr .n{font-family:var(--lp-font-mono);font-size:10px;letter-spacing:.16em;color:var(--lp-ink-muted)}
+.pr .t{font-size:15px;margin:8px 0 6px;line-height:1.4}
+.pr .d{font-size:13px;color:var(--lp-ink-2);line-height:1.7}
+
+/* swatches */
+.sw{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:14px;margin-top:20px}
+.sw .c{border:1px solid var(--lp-rule);border-radius:var(--lp-r-box);overflow:hidden}
+.sw .chip{height:64px}
+.sw .meta{padding:10px 12px 12px;font-family:var(--lp-font-mono);font-size:11px;line-height:1.7}
+.sw .meta .nm{color:var(--lp-ink)}
+.sw .meta .hx{color:var(--lp-ink-muted);text-transform:uppercase}
+.sw .meta .cr{color:var(--lp-ink-2)}
+.pass{color:var(--lp-ink-2)}
+.warn{color:var(--lp-danger)}
+
+/* wall demo */
+.walldemo{display:grid;grid-auto-flow:column;grid-auto-columns:10px;grid-template-rows:repeat(7,10px);
+  gap:3px;margin-top:20px;overflow:hidden}
+.walldemo i{border-radius:var(--lp-r-cell);display:block}
+.ramp{display:flex;gap:14px;flex-wrap:wrap;margin-top:22px}
+.ramp .r{font-family:var(--lp-font-mono);font-size:10.5px;color:var(--lp-ink-muted);text-align:center}
+.ramp .r i{width:56px;height:34px;border-radius:var(--lp-r-cell);display:block;margin-bottom:7px;
+  border:1px solid var(--lp-rule)}
+
+/* type specimen */
+.spec{border-top:1px solid var(--lp-rule);padding:18px 0;display:grid;
+  grid-template-columns:120px 1fr;gap:20px;align-items:baseline}
+.spec .k{font-family:var(--lp-font-mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--lp-ink-muted);line-height:1.8}
+.spec .k em{display:block;font-style:normal;letter-spacing:.02em;text-transform:none;font-size:10.5px;color:var(--lp-ink-faint)}
+.s-display{font-family:var(--lp-font-mono);font-size:30px;line-height:1.1;letter-spacing:.04em}
+.s-title{font-size:21px;line-height:1.25;letter-spacing:-.01em;font-weight:400}
+.s-body{font-size:14.5px;line-height:1.85;font-weight:300}
+.s-mono{font-family:var(--lp-font-mono);font-size:13.5px;line-height:1.55}
+.s-label{font-family:var(--lp-font-mono);font-size:12.5px;line-height:1.5}
+.s-caption{font-family:var(--lp-font-mono);font-size:11px;line-height:1.5;letter-spacing:.06em;color:var(--lp-ink-2)}
+.s-micro{font-family:var(--lp-font-mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--lp-ink-muted)}
+
+/* space scale */
+.spacescale{display:flex;align-items:flex-end;gap:12px;margin-top:20px;flex-wrap:wrap}
+.spacescale div{text-align:center;font-family:var(--lp-font-mono);font-size:10px;color:var(--lp-ink-muted)}
+.spacescale i{display:block;background:var(--lp-ink);border-radius:1px;margin:0 auto 7px}
+
+/* component demos */
+.demo{border:1px solid var(--lp-rule);border-radius:var(--lp-r-box);padding:22px var(--lp-gutter);
+  margin-top:16px;background:var(--lp-surface)}
+.demo.void{background:var(--lp-void);border-color:#1e1e1e;min-height:170px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+.demo.void .big{font-family:var(--lp-font-mono);font-size:30px;color:#3a3a3a;letter-spacing:.04em}
+.demo.void .hint{font-family:var(--lp-font-mono);font-size:11px;color:#2e2e2e;letter-spacing:.14em;text-align:center;line-height:2}
+.cap{font-family:var(--lp-font-mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--lp-ink-muted);margin-top:12px}
+
+.line{position:relative;display:flex;align-items:flex-start;gap:10px;padding:9px 8px 9px 0;
+  border-radius:var(--lp-r-row);overflow:hidden;cursor:pointer;user-select:none}
+.line .fill{position:absolute;left:-6px;top:0;bottom:0;width:0;background:var(--lp-rule-soft);
+  border-radius:var(--lp-r-row);z-index:0}
+.line.holding .fill{width:calc(100% + 12px);transition:width var(--lp-d-hold) linear}
+.line > *{position:relative;z-index:1}
+.box{flex:none;width:15px;height:15px;margin-top:3px;border:1.5px solid var(--lp-ink-muted);
+  border-radius:var(--lp-r-box);background:none;padding:0;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.box.on{background:var(--lp-ink);border-color:var(--lp-ink)}
+.box.on::after{content:"";width:7px;height:4px;border-left:1.6px solid var(--lp-surface);
+  border-bottom:1.6px solid var(--lp-surface);transform:rotate(-45deg) translate(1px,-1px)}
+.line .txt{flex:1;font-size:14.5px}
+.line.done .txt{color:var(--lp-ink-muted)}
+.line .tm{font-family:var(--lp-font-mono);font-size:12.5px;color:var(--lp-ink-2);font-variant-numeric:tabular-nums}
+.line .tm.zero{color:var(--lp-ink-faint)}
+
+.frow{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:9px 0;border-radius:var(--lp-r-row)}
+.frow .fn{font-family:var(--lp-font-mono);font-size:12.5px;color:var(--lp-ink-2)}
+.strip{display:grid;grid-auto-flow:column;grid-auto-columns:7px;gap:2px}
+.strip i{height:7px;border-radius:var(--lp-r-cell);display:block}
+.toastdemo{display:inline-block;background:var(--lp-ink);color:var(--lp-surface);
+  font-family:var(--lp-font-mono);font-size:11.5px;padding:8px 15px;border-radius:var(--lp-r-pill)}
+.txtbtn{background:none;border:0;padding:8px 0;cursor:pointer;color:var(--lp-ink-muted);
+  font-family:var(--lp-font-mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase}
+.txtbtn:hover{color:var(--lp-ink)}
+.txtbtn.danger{color:var(--lp-danger)}
+.playbtn{background:none;border:1px solid var(--lp-rule);border-radius:var(--lp-r-pill);
+  padding:7px 14px;font-family:var(--lp-font-mono);font-size:10.5px;letter-spacing:.1em;
+  color:var(--lp-ink-2);cursor:pointer;margin-top:14px}
+.playbtn:hover{border-color:var(--lp-ink-muted)}
+
+/* tables */
+table{width:100%;border-collapse:collapse;margin-top:18px;font-size:13.5px}
+th,td{text-align:left;padding:11px 12px 11px 0;border-bottom:1px solid var(--lp-rule);vertical-align:top}
+th{font-family:var(--lp-font-mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--lp-ink-muted);font-weight:400}
+td.m{font-family:var(--lp-font-mono);font-size:12.5px;white-space:nowrap;color:var(--lp-ink-2)}
+
+/* do / dont */
+.dd{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--lp-rule);
+  border:1px solid var(--lp-rule);margin-top:20px}
+.dd > div{background:var(--lp-surface);padding:20px}
+.dd h4{font-family:var(--lp-font-mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  margin:0 0 14px;font-weight:400;color:var(--lp-ink-muted)}
+.dd ul{margin:0;padding-left:18px;font-size:13.5px;line-height:1.9;color:var(--lp-ink-2)}
+.dd li::marker{color:var(--lp-ink-faint)}
+.dd .yes h4{color:var(--lp-ink)}
+@media(max-width:640px){.dd{grid-template-columns:1fr}.spec{grid-template-columns:1fr;gap:6px}}
+
+.refuse{list-style:none;padding:0;margin:20px 0 0;max-width:64ch}
+.refuse li{padding:13px 0;border-bottom:1px solid var(--lp-rule);display:flex;gap:16px;align-items:baseline}
+.refuse .x{font-family:var(--lp-font-mono);color:var(--lp-ink-faint);flex:none}
+.refuse .why{color:var(--lp-ink-2);font-size:13px;display:block;margin-top:2px}
+footer{margin-top:90px;padding-top:26px;border-top:1px solid var(--lp-rule);
+  font-family:var(--lp-font-mono);font-size:10.5px;letter-spacing:.06em;color:var(--lp-ink-muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="mast">
+  <div>
+    <h1>lapse</h1>
+    <div class="sub">Design System · v1.0 · สิงหาคม 2026</div>
+  </div>
+  <button class="tgl" id="tgl">Dark</button>
+</div>
+
+<nav class="toc">
+  <a href="#p"><b>01</b>หลักการ</a>
+  <a href="#color"><b>02</b>สี</a>
+  <a href="#wall"><b>03</b>ไล่ระดับกำแพง</a>
+  <a href="#type"><b>04</b>ตัวอักษร</a>
+  <a href="#space"><b>05</b>ระยะและกริด</a>
+  <a href="#shape"><b>06</b>รูปทรงและเส้น</a>
+  <a href="#motion"><b>07</b>การเคลื่อนไหว</a>
+  <a href="#comp"><b>08</b>คอมโพเนนต์</a>
+  <a href="#icon"><b>09</b>ไอคอน</a>
+  <a href="#voice"><b>10</b>น้ำเสียง</a>
+  <a href="#refuse"><b>11</b>สิ่งที่ระบบนี้ปฏิเสธ</a>
+</nav>
+
+<!-- 01 -->
+<section id="p">
+  <h2>01 — Principles</h2>
+  <p class="lede">หลักการห้าข้อ ทุกการตัดสินใจในเอกสารนี้ย้อนกลับไปหาข้อใดข้อหนึ่งได้</p>
+  <div class="pr">
+    <div><div class="n">01</div><div class="t">การตัดออกคือฟีเจอร์</div>
+      <div class="d">ทุกอย่างที่เพิ่มเข้ามาต้องแลกด้วยการเอาอย่างอื่นออก ถ้าเถียงไม่ได้ว่ามันจำเป็น แปลว่ามันไม่จำเป็น</div></div>
+    <div><div class="n">02</div><div class="t">วันที่คือระบบจัดระเบียบเดียว</div>
+      <div class="d">ไม่มีโฟลเดอร์ แท็ก โปรเจกต์ หมวดวิชา หรือลำดับความสำคัญ หนึ่งวันคือหนึ่งหน้า</div></div>
+    <div><div class="n">03</div><div class="t">ความเงียบคือสถานะปกติ</div>
+      <div class="d">แอปไม่เรียกหาผู้ใช้ ไม่เตือน ไม่ฉลอง ไม่ทวง ผู้ใช้เป็นฝ่ายเดินเข้ามาหาเสมอ</div></div>
+    <div><div class="n">04</div><div class="t">ข้อมูลเป็นของผู้ใช้</div>
+      <div class="d">เก็บเป็น plain text อ่านออกได้ด้วยตาเปล่า ส่งออกได้ฟรีตลอด ไม่มีฟอร์แมตที่ผูกขาด</div></div>
+    <div><div class="n">05</div><div class="t">ไม่ตัดสินผู้ใช้</div>
+      <div class="d">วันที่ว่างคือวันที่ว่าง ไม่ใช่ความล้มเหลว ไม่มีสีแดง ไม่มี streak ที่ขาด ไม่มีอันดับ</div></div>
+  </div>
+</section>
+
+<!-- 02 -->
+<section id="color">
+  <h2>02 — Color</h2>
+  <p class="lede">หมึกบนกระดาษ ไม่มีสีแบรนด์ สีเดียวที่มีคือสีสำหรับการทำลายข้อมูล</p>
+  <p class="note">ทั้งสองธีมถูกเลือกทีละค่า ไม่ใช่การกลับสีอัตโนมัติ ค่าคอนทราสต์ด้านล่างวัดกับพื้นหลังของธีมนั้นๆ
+    ข้อความหลักและข้อความรองผ่านมาตรฐาน WCAG AA ทั้งคู่ ส่วน <code>ink-faint</code> ห้ามใช้กับข้อความ ใช้ได้เฉพาะกับเครื่องหมายที่ไม่ต้องอ่าน</p>
+  <div class="sw" id="swatches"></div>
+  <div class="rulebox"><b>กฎ:</b> ข้อความสวมโทเคนของข้อความเสมอ ห้ามใช้สีจากไล่ระดับกำแพงมาเป็นสีตัวหนังสือ
+    และห้ามใช้ <code>danger</code> กับอะไรก็ตามที่ไม่ใช่การลบข้อมูลถาวร</div>
+</section>
+
+<!-- 03 -->
+<section id="wall">
+  <h2>03 — Wall ramp</h2>
+  <p class="lede">ไล่ระดับโทนเดียว ห้าขั้น อ่อนไปเข้ม — ไม่ใช่สีเขียว ไม่ใช่สายรุ้ง</p>
+  <p class="note">ระดับผูกกับเวลาที่โฟกัสจริง ไม่ใช่เวลาที่เปิดแอปทิ้งไว้ ระยะห่างเชิงการรับรู้ระหว่างขั้นที่ติดกัน
+    (ΔE ในปริภูมิ OKLab ×100) อยู่ที่ 11.4–22.4 ในโหมดสว่าง และ 12.8–23.0 ในโหมดมืด ซึ่งห่างพอให้แยกออกทุกคู่</p>
+  <div class="ramp" id="ramp"></div>
+  <div class="walldemo" id="walldemo"></div>
+  <div class="cap">ตัวอย่างข้อมูลจริงจากโปรโตไทป์</div>
+  <div class="rulebox"><b>กฎ:</b> ช่องระดับ 0 ต้องยังมองเห็นว่าเป็นช่อง ไม่ใช่ความว่างเปล่า —
+    การไม่ได้อ่านเป็นข้อเท็จจริงที่ถูกบันทึก ไม่ใช่หลุมที่ต้องซ่อน</div>
+</section>
+
+<!-- 04 -->
+<section id="type">
+  <h2>04 — Typography</h2>
+  <p class="lede">สองตระกูล และการแบ่งงานระหว่างมันคือลายเซ็นของระบบนี้</p>
+  <div class="rulebox"><b>กฎแบ่งงาน:</b> <b>Mono</b> ใช้กับทุกอย่างที่เครื่องเป็นคนใส่ — เวลา วันที่ ตัวเลข
+    ชื่อผู้ใช้ ป้ายกำกับ โครงสร้าง · <b>Sans Thai</b> ใช้กับทุกอย่างที่มนุษย์เป็นคนพิมพ์ — ชื่องาน และบันทึก<br>
+    มองปราดเดียวต้องแยกออกว่าอะไรคือข้อมูล อะไรคือความคิดของตัวเอง</div>
+  <div class="spec"><div class="k">Display<em>30 / mono</em></div><div class="s-display">2:47</div></div>
+  <div class="spec"><div class="k">Title<em>21 / sans</em></div><div class="s-title">18 สิงหาคม</div></div>
+  <div class="spec"><div class="k">Body<em>14.5 / sans / 1.85</em></div><div class="s-body">เช้าสมาธิดีมาก บ่ายไม่ไหวเลย พรุ่งนี้ย้ายฟิสิกส์มาไว้เช้า</div></div>
+  <div class="spec"><div class="k">Mono<em>13.5 / mono</em></div><div class="s-mono">- [x] อ่านเลข บทที่ 4 &nbsp; 1:47</div></div>
+  <div class="spec"><div class="k">Label<em>12.5 / mono</em></div><div class="s-label">@jan · 405 ชั่วโมง</div></div>
+  <div class="spec"><div class="k">Caption<em>11 / mono</em></div><div class="s-caption">อังคาร · 2026</div></div>
+  <div class="spec"><div class="k">Micro<em>10 / mono / .16em</em></div><div class="s-micro">กำแพง</div></div>
+  <h3>น้ำหนัก</h3>
+  <p class="note">มีสามน้ำหนักเท่านั้น — 300 สำหรับเนื้อความ, 400 สำหรับหัวข้อและ mono, 500 สำหรับการเน้นที่หายากมาก
+    <b>ไม่มีตัวหนา</b> การเน้นทำด้วยขนาดและพื้นที่ว่าง ไม่ใช่ความหนา</p>
+  <h3>ข้อควรระวังสำหรับภาษาไทย</h3>
+  <p class="note">ไทยมีสระบนและวรรณยุกต์ซ้อนสองชั้น ระยะบรรทัดต่ำกว่า <b>1.8</b> จะทำให้ตัวอักษรชนกัน
+    เนื้อความไทยจึงใช้ 1.85 เสมอ ส่วน mono ใช้ 1.55 ได้เพราะเป็นตัวเลขและอักษรละตินเป็นหลัก
+    และ <b>ห้ามใช้ตัวพิมพ์ใหญ่ทั้งหมดกับข้อความไทย</b> — ใช้ได้เฉพาะป้าย micro ที่เป็นอังกฤษ</p>
+</section>
+
+<!-- 05 -->
+<section id="space">
+  <h2>05 — Space &amp; grid</h2>
+  <p class="lede">ฐาน 4px · ระยะขอบจอ 26px · พื้นที่กดขั้นต่ำ 44px</p>
+  <div class="spacescale" id="spacescale"></div>
+  <p class="note">พื้นที่ว่างคือเครื่องมือหลักของระบบนี้ ในเมื่อไม่มีสี ไม่มีเงา และไม่มีตัวหนา
+    <b>ลำดับความสำคัญถูกสื่อด้วยระยะห่างเกือบทั้งหมด</b> ถ้ารู้สึกว่าหน้าจอแน่นเกินไป ให้เพิ่มระยะ ไม่ใช่ลดขนาดตัวอักษร</p>
+  <div class="rulebox"><b>กฎ:</b> พื้นที่กดต้องไม่ต่ำกว่า 44px เสมอ แม้ว่าสิ่งที่มองเห็นจะเล็กกว่านั้น —
+    ช่องกำแพงกว้าง 7px แต่พื้นที่กดของมันคือทั้งคอลัมน์</div>
+</section>
+
+<!-- 06 -->
+<section id="shape">
+  <h2>06 — Shape &amp; edges</h2>
+  <p class="lede">ไม่มีเงาในระบบนี้ ระดับชั้นสร้างด้วยเส้นบางกับพื้นผิวเท่านั้น</p>
+  <table>
+    <tr><th>โทเคน</th><th>ค่า</th><th>ใช้กับ</th></tr>
+    <tr><td class="m">radius-cell</td><td class="m">2px</td><td>ช่องบนกำแพง แถบของเพื่อน</td></tr>
+    <tr><td class="m">radius-box</td><td class="m">3px</td><td>ช่องติ๊ก แผงข้อมูล</td></tr>
+    <tr><td class="m">radius-row</td><td class="m">5px</td><td>แถวรายการ พื้นตอนกดค้าง</td></tr>
+    <tr><td class="m">radius-pill</td><td class="m">20px</td><td>toast และปุ่มแบบเม็ดยา</td></tr>
+    <tr><td class="m">hairline</td><td class="m">1px</td><td>เส้นคั่นทุกเส้น</td></tr>
+    <tr><td class="m">stroke</td><td class="m">1.5px</td><td>ขอบช่องติ๊ก และกรอบช่องที่ถูกเลือก</td></tr>
+    <tr><td class="m">shadow</td><td class="m">none</td><td>—</td></tr>
+  </table>
+</section>
+
+<!-- 07 -->
+<section id="motion">
+  <h2>07 — Motion</h2>
+  <p class="lede">การเคลื่อนไหวมีหน้าที่เดียว คือบอกความจริงเรื่องเวลา</p>
+  <table>
+    <tr><th>โทเคน</th><th>เวลา</th><th>เส้นโค้ง</th><th>ใช้กับ</th></tr>
+    <tr><td class="m">quick</td><td class="m">180ms</td><td class="m">ease-out</td><td>เปลี่ยนสีตอน hover ติ๊กช่อง</td></tr>
+    <tr><td class="m">base</td><td class="m">320ms</td><td class="m">ease-out</td><td>เปลี่ยนหน้าจอ เลื่อนหา toast</td></tr>
+    <tr><td class="m">hold</td><td class="m">560ms</td><td class="m">linear</td><td><b>กดค้างเพื่อเริ่มจับเวลา</b></td></tr>
+    <tr><td class="m">end</td><td class="m">720ms</td><td class="m">linear</td><td><b>กดค้างเพื่อจบ</b> — นานกว่าตอนเริ่มโดยตั้งใจ</td></tr>
+    <tr><td class="m">fade</td><td class="m">1200ms</td><td class="m">ease-out</td><td>คำใบ้ที่ค่อยๆ จางหาย</td></tr>
+  </table>
+  <div class="rulebox"><b>กฎ:</b> แถบที่วิ่งระหว่างกดค้างต้องเป็น <code>linear</code> เสมอ
+    เพราะมันคือมาตรวัดเวลาจริง ไม่ใช่ของประดับ · ห้ามมี bounce, spring, หรือการเด้งขยาย
+    ถ้าการเคลื่อนไหวไหนไม่ได้สื่อสถานะหรือระยะเวลา ให้เอาออก</div>
+  <h3>สองจังหวะที่เป็นพิธีกรรม</h3>
+  <p class="note">560ms ตอนเริ่ม และ 720ms ตอนจบ คือแรงต้านที่ตั้งใจใส่ ไม่ใช่ความหน่วง
+    มันทำให้การเริ่มอ่านเป็นการตัดสินใจ ไม่ใช่การเผลอกด และทำให้การจบไม่เกิดขึ้นโดยบังเอิญ</p>
+  <div class="demo">
+    <div class="line" id="holddemo"><span class="fill"></span>
+      <button class="box"></button><span class="txt">สรุปฟิสิกส์</span><span class="tm zero">—</span></div>
+    <button class="playbtn" id="playhold">เล่นจังหวะกดค้าง 560ms</button>
+  </div>
+</section>
+
+<!-- 08 -->
+<section id="comp">
+  <h2>08 — Components</h2>
+  <p class="lede">ทั้งแอปมีคอมโพเนนต์เก้าตัว และไม่ควรมีตัวที่สิบโดยไม่เอาตัวใดตัวหนึ่งออก</p>
+
+  <h3>Line — แถวรายการ</h3>
+  <p class="note">หน่วยพื้นฐานที่สุดของแอป เป็นทั้งรายการสิ่งที่ต้องทำ ตัวจับเวลา และบันทึกในตัวเดียว
+    สถานะ: ปกติ · กำลังกดค้าง · ทำแล้ว · กำลังแก้ข้อความ</p>
+  <div class="demo">
+    <div class="line"><span class="fill"></span><button class="box on"></button>
+      <span class="txt">อ่านเลข บทที่ 4</span><span class="tm">1:47</span></div>
+    <div class="line"><span class="fill"></span><button class="box on"></button>
+      <span class="txt">ท่องศัพท์ 50 คำ</span><span class="tm">0:32</span></div>
+    <div class="line"><span class="fill"></span><button class="box"></button>
+      <span class="txt">สรุปฟิสิกส์</span><span class="tm zero">—</span></div>
+  </div>
+  <div class="cap">แตะข้อความเพื่อแก้ · แตะช่องเพื่อติ๊ก · กดค้างที่แถวเพื่อเริ่มจับเวลา</div>
+
+  <h3>Focus — จอโฟกัส</h3>
+  <p class="note">ดำสนิท <code>#000000</code> เท่านั้น ไม่ใช่เทาเข้ม เพราะบนจอ OLED สีดำสนิทคือพิกเซลที่ดับจริง
+    ไม่มีตัวเลขนับ ไม่มีวงกลม ไม่มีแถบ ต้องแตะถึงจะเห็นเวลา แล้วมันจะจางหายไปเอง</p>
+  <div class="demo void">
+    <div class="big">2:47</div>
+    <div class="hint">แตะเพื่อดูเวลา<br>กดค้างเพื่อจบ</div>
+  </div>
+  <div class="rulebox"><b>ข้อยกเว้นที่รู้ตัว:</b> ข้อความคำใบ้บนจอดำมีคอนทราสต์ราว 1.6:1 ซึ่งต่ำกว่ามาตรฐานมาก
+    นี่เป็นความตั้งใจ — มันต้องแทบมองไม่เห็น <b>ทางแก้:</b> ครั้งแรกที่ผู้ใช้เข้าโหมดนี้ ให้แสดงคำใบ้ด้วยคอนทราสต์ปกติ
+    แล้วค่อยหรี่ลงถาวรหลังจากนั้น ไม่ใช่ปล่อยให้จางตั้งแต่ครั้งแรก</div>
+
+  <h3>Wall cell &amp; friend row</h3>
+  <div class="demo">
+    <div class="frow"><span class="fn">@jan (คุณ)</span><span class="strip" data-strip="1"></span></div>
+    <div class="frow"><span class="fn">@ploy</span><span class="strip" data-strip="2"></span></div>
+    <div class="frow"><span class="fn">@nine</span><span class="strip" data-strip="3"></span></div>
+  </div>
+  <div class="cap">เรียงตามลำดับที่เพิ่ม ไม่เรียงตามเวลา ไม่มีตัวเลขเทียบ</div>
+
+  <h3>Toast &amp; buttons</h3>
+  <div class="demo">
+    <div class="toastdemo">+ 47 นาที</div>
+    <div style="margin-top:18px;display:flex;gap:26px;align-items:center">
+      <button class="txtbtn">กำแพง</button>
+      <button class="txtbtn">‹ วัน</button>
+      <button class="txtbtn danger">ลบวันนี้</button>
+    </div>
+  </div>
+  <div class="rulebox"><b>กฎ:</b> ไม่มีปุ่มแบบมีพื้นสีในระบบนี้ ปุ่มทุกตัวเป็นข้อความล้วน
+    การกระทำที่สำคัญที่สุดของแอป (เริ่มจับเวลา) ไม่ใช่ปุ่มด้วยซ้ำ — มันคือการกดค้าง</div>
+</section>
+
+<!-- 09 -->
+<section id="icon">
+  <h2>09 — Iconography</h2>
+  <p class="lede">ระบบนี้ไม่มีชุดไอคอน และนั่นคือการตัดสินใจ ไม่ใช่งานที่ยังไม่ได้ทำ</p>
+  <p class="note">ไอคอนคือการบีบความหมายลงในภาพที่ต้องเรียนรู้ ในแอปที่มีเพียงสองหน้าจอ คำก็เพียงพอและชัดกว่า
+    สัญลักษณ์ทั้งหมดที่ระบบนี้อนุญาตมีสามอย่าง:</p>
+  <table>
+    <tr><th>สัญลักษณ์</th><th>ความหมาย</th><th>หมายเหตุ</th></tr>
+    <tr><td class="m" style="font-size:17px">‹ ›</td><td>ย้อนกลับ / ถัดไป</td><td>ใช้กับการเปลี่ยนวันเท่านั้น</td></tr>
+    <tr><td class="m" style="font-size:17px">✓</td><td>ทำแล้ว</td><td>วาดด้วย CSS ไม่ใช่ฟอนต์ไอคอน</td></tr>
+    <tr><td class="m" style="font-size:17px">—</td><td>ยังไม่มีเวลา</td><td>แทนที่จะเขียน 0:00 ซึ่งดูเหมือนความล้มเหลว</td></tr>
+  </table>
+</section>
+
+<!-- 10 -->
+<section id="voice">
+  <h2>10 — Voice &amp; tone</h2>
+  <p class="lede">พูดกับผู้ใช้เหมือนเพื่อนที่นั่งอ่านหนังสืออยู่โต๊ะข้างๆ ไม่ใช่โค้ชและไม่ใช่แอป</p>
+  <div class="dd">
+    <div class="yes"><h4>ทำ</h4><ul>
+      <li>สั้น ตรง ประโยคเดียวจบ</li>
+      <li>ใช้ตัวพิมพ์เล็กกับข้อความอังกฤษ</li>
+      <li>บอกข้อเท็จจริง — “+ 47 นาที”</li>
+      <li>ชวนแบบไม่กดดัน — “จำอะไรได้บ้าง เขียนมั่วๆ ก็ได้”</li>
+      <li>ยอมรับวันที่ว่างอย่างเป็นกลาง</li>
+    </ul></div>
+    <div><h4>ไม่ทำ</h4><ul>
+      <li>เครื่องหมายอัศเจรีย์ และอีโมจิ</li>
+      <li>คำชมเกินจริง — “เก่งมาก!” “สุดยอด!”</li>
+      <li>ทวงถาม — “ไม่ได้เข้ามาสามวันแล้วนะ”</li>
+      <li>ศัพท์เกม — แต้ม เลเวล ภารกิจ รางวัล</li>
+      <li>เปรียบเทียบ — “คุณอ่านน้อยกว่าเพื่อน 62%”</li>
+    </ul></div>
+  </div>
+  <div class="rulebox"><b>บททดสอบ:</b> อ่านข้อความนั้นออกเสียงดังๆ ถ้ามันฟังเหมือนโฆษณาหรือเหมือนครูฝ่ายปกครอง ให้เขียนใหม่</div>
+</section>
+
+<!-- 11 -->
+<section id="refuse">
+  <h2>11 — สิ่งที่ระบบนี้ปฏิเสธ</h2>
+  <p class="lede">ส่วนที่สำคัญที่สุดของเอกสารนี้ — เขียนไว้เพื่อให้เถียงกับตัวเองในอีกหกเดือนได้</p>
+  <ul class="refuse">
+    <li><span class="x">✕</span><span><b>Streak</b><span class="why">มันลงโทษความไม่สม่ำเสมอ และทำให้คนเลิกใช้ทั้งหมดหลังพลาดวันแรก</span></span></li>
+    <li><span class="x">✕</span><span><b>อันดับและกระดานผู้นำ</b><span class="why">เปลี่ยนการอ่านหนังสือเป็นการแข่ง ซึ่งเป็นสิ่งที่ YPT ทำแล้ว</span></span></li>
+    <li><span class="x">✕</span><span><b>เหรียญตรา แต้ม เลเวล</b><span class="why">แรงจูงใจภายนอกกลบแรงจูงใจภายใน และเสื่อมเร็ว</span></span></li>
+    <li><span class="x">✕</span><span><b>การแจ้งเตือนแบบ push</b><span class="why">ขัดหลักการข้อ 03 โดยตรง สรุปรายสัปดาห์พอ</span></span></li>
+    <li><span class="x">✕</span><span><b>สีแดงสำหรับวันที่ไม่ได้อ่าน</b><span class="why">สีเดียวในระบบสงวนไว้ให้การลบข้อมูลเท่านั้น</span></span></li>
+    <li><span class="x">✕</span><span><b>เงาและการไล่สี</b><span class="why">เลียนแบบวัสดุที่ไม่มีอยู่จริง เพิ่มความรกโดยไม่เพิ่มความหมาย</span></span></li>
+    <li><span class="x">✕</span><span><b>หน้าจอฉลองแบบ modal</b><span class="why">ขัดจังหวะคนที่เพิ่งกลับเข้าสู่สมาธิได้</span></span></li>
+    <li><span class="x">✕</span><span><b>เพลงและเสียงประกอบ</b><span class="why">ความเงียบคือฟีเจอร์ ไม่ใช่ช่องว่างที่ต้องเติม</span></span></li>
+    <li><span class="x">✕</span><span><b>การจำกัดจำนวนวันย้อนหลังในเวอร์ชันฟรี</b><span class="why">กำแพงที่ถูกตัดคือกำแพงที่ไม่มีความหมาย</span></span></li>
+  </ul>
+</section>
+
+<footer>Lapse Design System v1.0 · โทเคนทั้งหมดอยู่ใน lapse-tokens.css และ lapse-tokens.json</footer>
+</div>
+
+<script>
+/* ---- swatches ---- */
+const SW = {
+  light:[["surface","#F4F2ED","พื้นหลัง",null],["surface-raised","#FBFAF7","แผ่นยก",null],
+         ["ink","#171614","ข้อความหลัก","16.2:1"],["ink-2","#5C5A54","ข้อความรอง","6.2:1"],
+         ["ink-muted","#8B877D","คำอธิบาย","3.2:1"],["ink-faint","#CFCBC2","เครื่องหมาย ห้ามใช้กับข้อความ",null],
+         ["rule","#E3E0D8","เส้นคั่น",null],["rule-soft","#EEEBE4","พื้นตอนกด",null],
+         ["void","#000000","จอโฟกัส",null],["danger","#A33A31","ลบข้อมูล","5.9:1"]],
+  dark:[["surface","#151513","พื้นหลัง",null],["surface-raised","#1C1B19","แผ่นยก",null],
+        ["ink","#F2F0EA","ข้อความหลัก","16.0:1"],["ink-2","#A8A49A","ข้อความรอง","7.4:1"],
+        ["ink-muted","#6B675F","คำอธิบาย","3.3:1"],["ink-faint","#43413D","เครื่องหมาย ห้ามใช้กับข้อความ",null],
+        ["rule","#2B2A27","เส้นคั่น",null],["rule-soft","#232220","พื้นตอนกด",null],
+        ["void","#000000","จอโฟกัส",null],["danger","#E07A6E","ลบข้อมูล","6.3:1"]]
+};
+const RAMP = {
+  light:[["#E6E3DC","ไม่ได้อ่าน"],["#C2BEB4","< 1 ชม."],["#918D83","1–2.5"],["#57544D","2.5–4.3"],["#1C1B18","> 4.3"]],
+  dark: [["#242320","ไม่ได้อ่าน"],["#454340","< 1 ชม."],["#6F6C65","1–2.5"],["#A8A49A","2.5–4.3"],["#F0EEE8","> 4.3"]]
+};
+function theme(){ return document.documentElement.dataset.theme; }
+function paint(){
+  const t = theme();
+  document.getElementById("swatches").innerHTML = SW[t].map(([n,h,u,c])=>`
+    <div class="c"><div class="chip" style="background:${h}"></div>
+      <div class="meta"><div class="nm">${n}</div><div class="hx">${h}</div>
+      <div class="cr">${u}${c?` · <span class="pass">${c}</span>`:""}</div></div></div>`).join("");
+  document.getElementById("ramp").innerHTML = RAMP[t].map(([h,l],i)=>`
+    <div class="r"><i style="background:${h}"></i>${i} · ${l}</div>`).join("");
+}
+/* ---- wall demo (deterministic) ---- */
+function mul(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;}}
+(function(){
+  const r=mul(7), g=document.getElementById("walldemo"), out=[];
+  for(let i=0;i<7*30;i++){ const v=r(); const l = v<.22?0 : v<.42?1 : v<.68?2 : v<.88?3 : 4; out.push(l); }
+  g.innerHTML = out.map(l=>`<i style="background:var(--lp-wall-${l})"></i>`).join("");
+  document.querySelectorAll(".strip").forEach((s,si)=>{
+    const rr=mul(21+si*13); let h="";
+    for(let i=0;i<28;i++){ const v=rr(); const l=v<.25?0:v<.45?1:v<.7?2:v<.9?3:4; h+=`<i style="background:var(--lp-wall-${l})"></i>`; }
+    s.innerHTML=h;
+  });
+})();
+/* ---- space scale ---- */
+document.getElementById("spacescale").innerHTML =
+  [2,4,8,12,16,20,26,34,46,64].map(v=>`<div><i style="width:${v}px;height:${v}px"></i>${v}</div>`).join("");
+/* ---- hold demo ---- */
+document.getElementById("playhold").onclick = () => {
+  const l = document.getElementById("holddemo");
+  l.classList.remove("holding"); void l.offsetWidth; l.classList.add("holding");
+  setTimeout(()=>l.classList.remove("holding"), 1500);
+};
+/* ---- theme ---- */
+document.getElementById("tgl").onclick = e => {
+  const d = theme()==="dark";
+  document.documentElement.dataset.theme = d ? "light" : "dark";
+  e.target.textContent = d ? "Dark" : "Light";
+  paint();
+};
+paint();
+</script>
+</body>
+</html>

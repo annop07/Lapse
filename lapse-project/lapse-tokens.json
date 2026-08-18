@@ -1,0 +1,211 @@
+{
+  "$schema": "lapse.tokens/1.0",
+  "name": "Lapse Design Tokens",
+  "version": "1.0.0",
+  "color": {
+    "light": {
+      "surface": "#F4F2ED",
+      "surfaceRaised": "#FBFAF7",
+      "ink": "#171614",
+      "ink2": "#5C5A54",
+      "inkMuted": "#8B877D",
+      "inkFaint": "#CFCBC2",
+      "rule": "#E3E0D8",
+      "ruleSoft": "#EEEBE4",
+      "void": "#000000",
+      "danger": "#A33A31",
+      "wall": [
+        "#E6E3DC",
+        "#C2BEB4",
+        "#918D83",
+        "#57544D",
+        "#1C1B18"
+      ]
+    },
+    "dark": {
+      "surface": "#151513",
+      "surfaceRaised": "#1C1B19",
+      "ink": "#F2F0EA",
+      "ink2": "#A8A49A",
+      "inkMuted": "#6B675F",
+      "inkFaint": "#43413D",
+      "rule": "#2B2A27",
+      "ruleSoft": "#232220",
+      "void": "#000000",
+      "danger": "#E07A6E",
+      "wall": [
+        "#242320",
+        "#454340",
+        "#6F6C65",
+        "#A8A49A",
+        "#F0EEE8"
+      ]
+    },
+    "contrast": {
+      "light": {
+        "ink": 16.16,
+        "ink2": 6.16,
+        "inkMuted": 3.2,
+        "danger": 5.85
+      },
+      "dark": {
+        "ink": 16.04,
+        "ink2": 7.35,
+        "inkMuted": 3.25,
+        "danger": 6.25
+      }
+    },
+    "wallAdjacentDeltaE": {
+      "light": [
+        11.4,
+        15.8,
+        19.7,
+        22.4
+      ],
+      "dark": [
+        12.8,
+        14.8,
+        18.7,
+        23.0
+      ]
+    }
+  },
+  "type": {
+    "families": {
+      "mono": "IBM Plex Mono",
+      "sans": "IBM Plex Sans Thai"
+    },
+    "weights": {
+      "light": 300,
+      "regular": 400,
+      "medium": 500
+    },
+    "scale": {
+      "display": {
+        "size": 30,
+        "lineHeight": 1.1,
+        "tracking": ".04em",
+        "family": "mono"
+      },
+      "title": {
+        "size": 21,
+        "lineHeight": 1.25,
+        "tracking": "-.01em",
+        "family": "sans"
+      },
+      "body": {
+        "size": 14.5,
+        "lineHeight": 1.85,
+        "tracking": "0",
+        "family": "sans"
+      },
+      "mono": {
+        "size": 13.5,
+        "lineHeight": 1.55,
+        "tracking": ".01em",
+        "family": "mono"
+      },
+      "label": {
+        "size": 12.5,
+        "lineHeight": 1.5,
+        "tracking": ".02em",
+        "family": "mono"
+      },
+      "caption": {
+        "size": 11,
+        "lineHeight": 1.5,
+        "tracking": ".06em",
+        "family": "mono"
+      },
+      "micro": {
+        "size": 10,
+        "lineHeight": 1.4,
+        "tracking": ".16em",
+        "family": "mono",
+        "transform": "uppercase"
+      }
+    }
+  },
+  "space": {
+    "base": 4,
+    "scale": [
+      2,
+      4,
+      8,
+      12,
+      16,
+      20,
+      26,
+      34,
+      46,
+      64
+    ],
+    "gutter": 26,
+    "minTouchTarget": 44
+  },
+  "radius": {
+    "cell": 2,
+    "box": 3,
+    "row": 5,
+    "pill": 20,
+    "device": 46
+  },
+  "border": {
+    "hairline": 1,
+    "stroke": 1.5
+  },
+  "motion": {
+    "duration": {
+      "quick": 180,
+      "base": 320,
+      "hold": 560,
+      "end": 720,
+      "fade": 1200
+    },
+    "easing": {
+      "out": "cubic-bezier(.2,.7,.3,1)",
+      "linear": "linear"
+    }
+  },
+  "elevation": {
+    "shadow": "none",
+    "note": "ระดับชั้นสร้างด้วยเส้น hairline และพื้นผิวเท่านั้น"
+  },
+  "wallLevels": [
+    {
+      "level": 0,
+      "minutes": [
+        0,
+        0
+      ]
+    },
+    {
+      "level": 1,
+      "minutes": [
+        1,
+        59
+      ]
+    },
+    {
+      "level": 2,
+      "minutes": [
+        60,
+        149
+      ]
+    },
+    {
+      "level": 3,
+      "minutes": [
+        150,
+        259
+      ]
+    },
+    {
+      "level": 4,
+      "minutes": [
+        260,
+        null
+      ]
+    }
+  ]
+}
