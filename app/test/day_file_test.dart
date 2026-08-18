@@ -8,8 +8,8 @@ void main() {
   group('parse', () {
     test('ตัวอย่างในสเปก §2.2', () {
       const src = '''
-- [x] อ่านเลข บทที่ 4 [1:47]
-- [x] ท่องศัพท์ 50 คำ [0:32]
+- [x] อ่านเลข บทที่ 4 [1:47:00]
+- [x] ท่องศัพท์ 50 คำ [0:32:00]
 - [ ] สรุปฟิสิกส์
 
 ---
@@ -19,13 +19,13 @@ void main() {
       final day = parseDayFile(_d, src);
 
       expect(day.lines.toList(), [
-        const Line(text: 'อ่านเลข บทที่ 4', done: true, minutes: 107),
-        const Line(text: 'ท่องศัพท์ 50 คำ', done: true, minutes: 32),
+        const Line(text: 'อ่านเลข บทที่ 4', done: true, seconds: 6420),
+        const Line(text: 'ท่องศัพท์ 50 คำ', done: true, seconds: 1920),
         const Line(text: 'สรุปฟิสิกส์'),
       ]);
       expect(day.journal,
           'เช้าสมาธิดีมาก บ่ายไม่ไหวเลย\nพรุ่งนี้ย้ายฟิสิกส์มาไว้เช้า');
-      expect(day.totalMinutes, 139);
+      expect(day.totalSeconds, 8340);
     });
 
     test('ไฟล์ว่างได้วันเปล่า', () {
@@ -48,14 +48,25 @@ void main() {
     });
 
     test('รายการที่ยังไม่เสร็จแต่มีเวลาแล้ว', () {
-      final day = parseDayFile(_d, '- [ ] อ่านเลข [0:12]\n');
+      final day = parseDayFile(_d, '- [ ] อ่านเลข [0:12:34]\n');
       expect(day.lines.single,
-          const Line(text: 'อ่านเลข', done: false, minutes: 12));
+          const Line(text: 'อ่านเลข', done: false, seconds: 754));
+    });
+
+    test('อ่านไฟล์รูปแบบเดิมที่ไม่มีวินาทีได้ถูกต้อง', () {
+      // ไฟล์ที่ผู้ใช้มีอยู่ก่อนเปลี่ยนหน่วยต้องไม่เพี้ยน
+      final day = parseDayFile(_d, '- [x] อ่านเลข [1:47]\n');
+      expect(day.lines.single.seconds, 6420);
+    });
+
+    test('เขียนกลับเป็นรูปแบบใหม่เสมอ', () {
+      final day = parseDayFile(_d, '- [x] อ่านเลข [1:47]\n');
+      expect(serializeDayFile(day), '- [x] อ่านเลข [1:47:00]\n');
     });
 
     test('รับ CRLF', () {
       final day = parseDayFile(_d, '- [x] a [1:00]\r\n\r\n---\r\nบันทึก\r\n');
-      expect(day.lines.single.minutes, 60);
+      expect(day.lines.single.seconds, 3600);
       expect(day.journal, 'บันทึก');
     });
 
@@ -64,18 +75,18 @@ void main() {
     });
 
     test('ชั่วโมงหลายหลัก', () {
-      expect(parseDayFile(_d, '- [x] a [12:05]\n').lines.single.minutes, 725);
+      expect(parseDayFile(_d, '- [x] a [12:05:09]\n').lines.single.seconds, 43509);
     });
 
     test('เวลาจับเฉพาะที่ท้ายบรรทัด', () {
-      final day = parseDayFile(_d, '- [ ] อ่าน [1:47] ต่อจากเมื่อวาน\n');
-      expect(day.lines.single.minutes, 0);
-      expect(day.lines.single.text, 'อ่าน [1:47] ต่อจากเมื่อวาน');
+      final day = parseDayFile(_d, '- [ ] อ่าน [1:47:00] ต่อจากเมื่อวาน\n');
+      expect(day.lines.single.seconds, 0);
+      expect(day.lines.single.text, 'อ่าน [1:47:00] ต่อจากเมื่อวาน');
     });
 
     test('นาทีเกิน 59 ไม่ใช่เวลา', () {
       final day = parseDayFile(_d, '- [ ] อ่านหน้า [1:99]\n');
-      expect(day.lines.single.minutes, 0);
+      expect(day.lines.single.seconds, 0);
       expect(day.lines.single.text, 'อ่านหน้า [1:99]');
     });
 
@@ -104,15 +115,15 @@ void main() {
       final day = Day(
         date: _d,
         entries: const [
-          Line(text: 'อ่านเลข บทที่ 4', done: true, minutes: 107),
-          Line(text: 'ท่องศัพท์ 50 คำ', done: true, minutes: 32),
+          Line(text: 'อ่านเลข บทที่ 4', done: true, seconds: 6420),
+          Line(text: 'ท่องศัพท์ 50 คำ', done: true, seconds: 1920),
           Line(text: 'สรุปฟิสิกส์'),
         ],
         journal: 'เช้าสมาธิดีมาก บ่ายไม่ไหวเลย',
       );
       expect(serializeDayFile(day), '''
-- [x] อ่านเลข บทที่ 4 [1:47]
-- [x] ท่องศัพท์ 50 คำ [0:32]
+- [x] อ่านเลข บทที่ 4 [1:47:00]
+- [x] ท่องศัพท์ 50 คำ [0:32:00]
 - [ ] สรุปฟิสิกส์
 
 ---
@@ -121,8 +132,8 @@ void main() {
     });
 
     test('บรรทัดที่มีเวลาแต่ยังไม่มีชื่อ', () {
-      final day = Day(date: _d, entries: const [Line(text: '', minutes: 60)]);
-      expect(serializeDayFile(day), '- [ ] [1:00]\n');
+      final day = Day(date: _d, entries: const [Line(text: '', seconds: 3600)]);
+      expect(serializeDayFile(day), '- [ ] [1:00:00]\n');
     });
 
     test('journal ที่มีแต่ช่องว่างไม่ทำให้เกิดเส้นคั่น', () {
@@ -133,11 +144,11 @@ void main() {
 
   group('round trip', () {
     const samples = [
-      '- [x] อ่านเลข บทที่ 4 [1:47]\n- [ ] สรุปฟิสิกส์\n\n---\nบันทึกของวัน\n',
+      '- [x] อ่านเลข บทที่ 4 [1:47:00]\n- [ ] สรุปฟิสิกส์\n\n---\nบันทึกของวัน\n',
       '- [ ] a\n',
       '---\nมีแต่บันทึก\n',
-      '# ของผู้ใช้\n- [x] b [0:05]\n\n---\nบรรทัดแรก\n---\nบรรทัดสาม\n',
-      '- [ ] [2:30]\n',
+      '# ของผู้ใช้\n- [x] b [0:05:00]\n\n---\nบรรทัดแรก\n---\nบรรทัดสาม\n',
+      '- [ ] [2:30:15]\n',
     ];
 
     for (var i = 0; i < samples.length; i++) {
@@ -166,21 +177,21 @@ void main() {
         entries: const [
           Line(text: 'a'),
           Line(text: ''),
-          Line(text: '', minutes: 30),
+          Line(text: '', seconds: 1800),
         ],
       );
       final kept = day.pruned().entries;
       expect(kept.length, 2);
-      expect((kept[1] as Line).minutes, 30);
+      expect((kept[1] as Line).seconds, 1800);
     });
 
     test('totalMinutes รวมเฉพาะรายการ', () {
       final day = Day(date: _d, entries: const [
-        Line(text: 'a', minutes: 107),
+        Line(text: 'a', seconds: 6420),
         RawLine('ข้อความอื่น'),
-        Line(text: 'b', minutes: 32),
+        Line(text: 'b', seconds: 1920),
       ]);
-      expect(day.totalMinutes, 139);
+      expect(day.totalSeconds, 8340);
     });
   });
 

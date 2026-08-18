@@ -89,11 +89,11 @@ class LapseStore extends ChangeNotifier {
       _updateLine(lineIndex, (line) => line.copyWith(done: !line.done));
 
   /// บวกเวลาที่เพิ่งโฟกัสเข้ารายการ (§4.3 ขั้นที่ 1)
-  Future<void> addMinutes(int lineIndex, int minutes) {
-    if (minutes <= 0) return Future.value();
+  Future<void> addSeconds(int lineIndex, int seconds) {
+    if (seconds <= 0) return Future.value();
     return _updateLine(
       lineIndex,
-      (line) => line.copyWith(minutes: line.minutes + minutes),
+      (line) => line.copyWith(seconds: line.seconds + seconds),
     );
   }
 
@@ -125,7 +125,7 @@ class LapseStore extends ChangeNotifier {
 
   // ---- กำแพง ----
 
-  Future<Map<String, int>> minutesByDate() => _days.minutesByDate();
+  Future<Map<String, int>> secondsByDate() => _days.secondsByDate();
 
   /// อ่านวันหนึ่งโดยไม่ย้ายวันที่กำลังดูอยู่
   ///

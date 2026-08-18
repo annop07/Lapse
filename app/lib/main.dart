@@ -7,6 +7,7 @@ library;
 import 'package:flutter/widgets.dart';
 
 import 'data/meta_store.dart';
+import 'model/duration_fmt.dart';
 import 'store/lapse_store.dart';
 import 'tokens/lapse_theme.dart';
 import 'tokens/lapse_tokens.dart';
@@ -105,22 +106,22 @@ class _RootState extends State<_Root> {
   void _startFocus(int lineIndex) => setState(() => _focusedLine = lineIndex);
 
   /// จบ session แล้วส่งต่อไปที่บันทึก — หกขั้นตามสเปก §4.3
-  Future<void> _finishFocus(int minutes) async {
+  Future<void> _finishFocus(int seconds) async {
     final store = widget.store;
     final lineIndex = _focusedLine;
     setState(() => _focusedLine = null);
 
     await store.markFirstFocusDone();
-    if (lineIndex == null || minutes <= 0) return;
+    if (lineIndex == null || seconds <= 0) return;
 
     final lines = store.day.lines.toList();
     final what = lineIndex < lines.length ? lines[lineIndex].text : '';
 
     // 1 บวกเวลาเข้ารายการ
-    await store.addMinutes(lineIndex, minutes);
+    await store.addSeconds(lineIndex, seconds);
 
-    // 2 แสดง toast
-    _showToast('+ $minutes นาที');
+    // 2 แสดง toast บอกข้อเท็จจริง ไม่ใช่คำชม
+    _showToast('+ ${formatThai(seconds)}');
 
     // 3 ถ้ามีข้อความเดิมอยู่แล้วให้ขึ้นบรรทัดใหม่ก่อน
     if (_journal.text.isNotEmpty && !_journal.text.endsWith('\n')) {

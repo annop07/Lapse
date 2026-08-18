@@ -19,7 +19,7 @@ class LineRow extends StatelessWidget {
   const LineRow({
     required this.text,
     required this.done,
-    required this.minutes,
+    required this.seconds,
     required this.controller,
     required this.focusNode,
     required this.onToggle,
@@ -30,7 +30,7 @@ class LineRow extends StatelessWidget {
 
   final String text;
   final bool done;
-  final int minutes;
+  final int seconds;
   final TextEditingController controller;
   final FocusNode focusNode;
   final VoidCallback onToggle;
@@ -89,7 +89,7 @@ class LineRow extends StatelessWidget {
                   ),
                 ),
               ),
-              _Time(minutes: minutes, colors: colors),
+              _Time(seconds: seconds, colors: colors),
             ],
           ),
         ],
@@ -176,9 +176,9 @@ class _BoxPainter extends CustomPainter {
 
 /// เวลาสะสมของแถว — mono เพราะเป็นสิ่งที่เครื่องใส่ ไม่ใช่สิ่งที่มนุษย์พิมพ์
 class _Time extends StatelessWidget {
-  const _Time({required this.minutes, required this.colors});
+  const _Time({required this.seconds, required this.colors});
 
-  final int minutes;
+  final int seconds;
   final LapseColors colors;
 
   @override
@@ -188,10 +188,10 @@ class _Time extends StatelessWidget {
           top: LapseSpace.s4,
         ),
         child: Text(
-          minutes > 0 ? formatHm(minutes) : '—',
+          seconds > 0 ? formatHms(seconds) : '—',
           style: lapseTextStyle(
             LapseType.mono,
-            color: minutes > 0 ? colors.ink2 : colors.inkFaint,
+            color: seconds > 0 ? colors.ink2 : colors.inkFaint,
           ),
         ),
       );

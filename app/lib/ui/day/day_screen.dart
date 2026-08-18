@@ -171,11 +171,11 @@ class DayScreenState extends State<DayScreen> {
               child: CustomScrollView(
                 controller: _scroll,
                 // ปัดลงเพื่อปิดคีย์บอร์ด — ท่ามาตรฐานของ iOS
-                //
-                // ก่อนหน้านี้ไม่มีทางปิดคีย์บอร์ดเลย แปลว่าพอเริ่มพิมพ์แล้ว
-                // จะเข้าหน้าโฟกัสไม่ได้จนกว่าจะเปลี่ยนวัน
                 keyboardDismissBehavior:
                     ScrollViewKeyboardDismissBehavior.onDrag,
+                // ต้องบังคับให้เลื่อนได้เสมอ ไม่งั้นวันที่มีของน้อยจะไม่มีอะไรให้เลื่อน
+                // แล้วการปัดลงจะไม่ทำงานเลย ซึ่งเป็นสิ่งที่เกิดขึ้นจริง
+                physics: const AlwaysScrollableScrollPhysics(),
                 slivers: [
                   SliverPadding(
                     padding:
@@ -187,7 +187,7 @@ class DayScreenState extends State<DayScreen> {
                             key: ValueKey('$_syncedDate-$i'),
                             text: lines[i].text,
                             done: lines[i].done,
-                            minutes: lines[i].minutes,
+                            seconds: lines[i].seconds,
                             controller: _rowControllers[i]!,
                             focusNode: _rowFocus[i]!,
                             onToggle: () => store.toggleLine(i),
@@ -219,7 +219,7 @@ class DayScreenState extends State<DayScreen> {
               ),
             ),
             _BottomBar(
-              minutes: day.totalMinutes,
+              seconds: day.totalSeconds,
               colors: colors,
               bottomInset: inset.bottom,
             ),
@@ -436,8 +436,13 @@ class _Journal extends StatelessWidget {
 
     return GestureDetector(
       // แตะตรงไหนของพื้นที่ที่เหลือก็เริ่มพิมพ์ได้ ไม่ต้องเล็งบรรทัดเล็กๆ
+      //
+      // แต่ถ้ากำลังพิมพ์อยู่แล้ว การแตะที่ว่างคือการบอกว่าพอแล้ว
+      // ไม่ใช่การขอโฟกัสซ้ำ — ไม่งั้นพื้นที่ครึ่งล่างของจอจะไม่มีทางปิดคีย์บอร์ดได้เลย
       behavior: HitTestBehavior.opaque,
-      onTap: focusNode.requestFocus,
+      onTap: () => focusNode.hasFocus
+          ? FocusScope.of(context).unfocus()
+          : focusNode.requestFocus(),
       child: AnimatedContainer(
         duration: LapseMotion.base,
         curve: LapseMotion.out,
@@ -486,12 +491,12 @@ class _Journal extends StatelessWidget {
 
 class _BottomBar extends StatelessWidget {
   const _BottomBar({
-    required this.minutes,
+    required this.seconds,
     required this.colors,
     required this.bottomInset,
   });
 
-  final int minutes;
+  final int seconds;
   final LapseColors colors;
   final double bottomInset;
 
@@ -511,10 +516,10 @@ class _BottomBar extends StatelessWidget {
             ),
             const Spacer(),
             Text(
-              minutes > 0 ? formatHm(minutes) : '—',
+              seconds > 0 ? formatHms(seconds) : '—',
               style: lapseTextStyle(
                 LapseType.mono,
-                color: minutes > 0 ? colors.ink2 : colors.inkFaint,
+                color: seconds > 0 ? colors.ink2 : colors.inkFaint,
               ),
             ),
           ],

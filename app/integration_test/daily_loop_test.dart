@@ -113,9 +113,9 @@ void main() {
     await settle(tester);
     expect(find.byType(FocusScreen), findsOneWidget);
 
-    // เวลาต้องเดินจริง 1 นาที ไม่มีทางลัด เพราะ §2.3 ทิ้ง session ที่สั้นกว่านั้น
-    // และนี่คือกลไกที่แยกผลิตภัณฑ์นี้ออกจากคู่แข่ง จึงคุ้มที่จะรอ
-    final until = DateTime.now().add(const Duration(seconds: 62));
+    // ตอนนี้นับทุกวินาทีแล้ว จึงไม่ต้องรอครบนาทีเหมือนก่อน
+    // แต่ยังต้องรอเวลาจริงอยู่ดี เพราะตัวจับเวลาอ่านนาฬิกาของเครื่อง
+    final until = DateTime.now().add(const Duration(seconds: 8));
     while (DateTime.now().isBefore(until)) {
       await tester.pump(const Duration(milliseconds: 200));
     }
@@ -131,11 +131,11 @@ void main() {
 
     expect(find.byType(FocusScreen), findsNothing);
 
-    // เวลาถูกบวกเข้ารายการ
-    expect(find.text('0:01'), findsWidgets);
+    // เวลาถูกบวกเข้ารายการเป็นวินาที
+    expect(find.textContaining('0:00:'), findsWidgets);
 
     // toast บอกข้อเท็จจริง ไม่ใช่คำชม
-    expect(find.text('+ 1 นาที'), findsOneWidget);
+    expect(find.textContaining('วินาที'), findsWidgets);
 
     // รอให้เลื่อนลงและไฮไลต์เสร็จ
     await settle(tester, 40);
@@ -161,7 +161,7 @@ void main() {
     final file = File('${docs.path}/lapse/days/$name.md');
     final text = await file.readAsString();
 
-    expect(text, contains('- [ ] อ่านเลข [0:01]'));
+    expect(text, contains('- [ ] อ่านเลข [0:00:'));
     expect(text, contains('---'));
     expect(text, contains('จำได้แค่สูตรอนุพันธ์'));
   });

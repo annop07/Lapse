@@ -4,12 +4,15 @@
 /// เพื่อให้ทดสอบรูปแบบไฟล์ได้เต็มที่โดยไม่ต้องมีเครื่องจริง
 ///
 /// ```markdown
-/// - [x] อ่านเลข บทที่ 4 [1:47]
+/// - [x] อ่านเลข บทที่ 4 [1:47:23]
 /// - [ ] สรุปฟิสิกส์
 ///
 /// ---
 /// เช้าสมาธิดีมาก บ่ายไม่ไหวเลย
 /// ```
+///
+/// เวลาเขียนเป็น `[h:mm:ss]` แต่ยังอ่านรูปแบบเดิม `[h:mm]` ได้
+/// เพราะไฟล์ที่ผู้ใช้มีอยู่แล้วต้องไม่เพี้ยนเมื่ออัปเดตแอป
 library;
 
 import '../model/day.dart';
@@ -19,11 +22,13 @@ import '../model/duration_fmt.dart';
 /// และยอมให้ไม่มีช่องว่างตามหลังได้ เผื่อบรรทัดที่ยังไม่มีชื่อ
 final _itemPattern = RegExp(r'^- \[([ xX])\][ ]?(.*)$');
 
-/// `[1:47]` ที่ท้ายบรรทัดเท่านั้น
+/// `[1:47:23]` หรือ `[1:47]` ที่ท้ายบรรทัดเท่านั้น
 ///
 /// ผูกกับท้ายบรรทัดโดยตั้งใจ ไม่งั้นชื่องานที่มีวงเล็บเหลี่ยมอยู่กลางประโยค
 /// จะถูกกินไปเป็นเวลา
-final _timePattern = RegExp(r'\s*\[(\d+):([0-5]\d)\]$');
+///
+/// กลุ่มวินาทีเป็น optional เพื่ออ่านไฟล์รูปแบบเดิมได้ · ไม่มีวินาที = เก่า
+final _timePattern = RegExp(r'\s*\[(\d+):([0-5]\d)(?::([0-5]\d))?\]$');
 
 /// เส้นคั่นระหว่างรายการกับ journal — ต้องเป็น `---` ที่ยืนอยู่บรรทัดเดียว
 bool _isSeparator(String line) => line.trim() == '---';
@@ -54,13 +59,14 @@ Day parseDayFile(DateTime date, String content) {
     }
     final done = m.group(1)!.toLowerCase() == 'x';
     var body = m.group(2)!;
-    var minutes = 0;
+    var seconds = 0;
     final t = _timePattern.firstMatch(body);
     if (t != null) {
-      minutes = int.parse(t.group(1)!) * 60 + int.parse(t.group(2)!);
+      seconds = int.parse(t.group(1)!) * 3600 + int.parse(t.group(2)!) * 60;
+      seconds += int.tryParse(t.group(3) ?? '') ?? 0;
       body = body.substring(0, t.start);
     }
-    entries.add(Line(text: body, done: done, minutes: minutes));
+    entries.add(Line(text: body, done: done, seconds: seconds));
   }
 
   // ตัดบรรทัดว่างท้ายส่วนรายการทิ้ง มันเป็นแค่ช่องว่างก่อนเส้นคั่น
@@ -96,6 +102,6 @@ String serializeDayFile(Day day) {
 String _renderLine(Line l) {
   final parts = <String>['- [${l.done ? 'x' : ' '}]'];
   if (l.text.isNotEmpty) parts.add(l.text);
-  if (l.minutes > 0) parts.add('[${formatHm(l.minutes)}]');
+  if (l.seconds > 0) parts.add('[${formatHms(l.seconds)}]');
   return parts.join(' ');
 }

@@ -27,13 +27,13 @@ void main() {
     final date = DateTime(2026, 8, 18);
     await repo.save(Day(
       date: date,
-      entries: const [Line(text: 'อ่านเลข', done: true, minutes: 107)],
+      entries: const [Line(text: 'อ่านเลข', done: true, seconds: 6420)],
       journal: 'เช้าสมาธิดี',
     ));
 
     repo.forgetCache();
     final back = await repo.load(date);
-    expect(back.lines.single.minutes, 107);
+    expect(back.lines.single.seconds, 6420);
     expect(back.journal, 'เช้าสมาธิดี');
   });
 
@@ -41,12 +41,12 @@ void main() {
     final date = DateTime(2026, 8, 18);
     await repo.save(Day(
       date: date,
-      entries: const [Line(text: 'ท่องศัพท์ 50 คำ', done: true, minutes: 32)],
+      entries: const [Line(text: 'ท่องศัพท์ 50 คำ', done: true, seconds: 1920)],
       journal: 'จำได้ครึ่งเดียว',
     ));
 
     expect(await repo.fileFor(date).readAsString(), '''
-- [x] ท่องศัพท์ 50 คำ [0:32]
+- [x] ท่องศัพท์ 50 คำ [0:32:00]
 
 ---
 จำได้ครึ่งเดียว
@@ -67,15 +67,15 @@ void main() {
     await repo.save(Day(date: date, entries: const [
       Line(text: 'a'),
       Line(text: ''),
-      Line(text: '', minutes: 30),
+      Line(text: '', seconds: 1800),
     ]));
 
-    expect(await repo.fileFor(date).readAsString(), '- [ ] a\n- [ ] [0:30]\n');
+    expect(await repo.fileFor(date).readAsString(), '- [ ] a\n- [ ] [0:30:00]\n');
   });
 
   test('แก้ไฟล์จากข้างนอกแล้วบรรทัดแปลกๆ ต้องไม่หาย', () async {
     final date = DateTime(2026, 8, 18);
-    const edited = '# หมายเหตุที่พิมพ์เอง\n- [x] อ่านเลข [1:00]\n';
+    const edited = '# หมายเหตุที่พิมพ์เอง\n- [x] อ่านเลข [1:00:00]\n';
     await repo.fileFor(date).writeAsString(edited);
 
     repo.forgetCache();
@@ -84,7 +84,7 @@ void main() {
 
     final onDisk = await repo.fileFor(date).readAsString();
     expect(onDisk, contains('# หมายเหตุที่พิมพ์เอง'));
-    expect(onDisk, contains('- [x] อ่านเลข [1:00]'));
+    expect(onDisk, contains('- [x] อ่านเลข [1:00:00]'));
     expect(onDisk, contains('เพิ่มบันทึก'));
   });
 
@@ -101,7 +101,7 @@ void main() {
   test('minutesByDate ข้ามวันที่ไม่มีเวลา', () async {
     await repo.save(Day(
       date: DateTime(2026, 8, 17),
-      entries: const [Line(text: 'a', minutes: 107)],
+      entries: const [Line(text: 'a', seconds: 6420)],
     ));
     await repo.save(Day(
       date: DateTime(2026, 8, 18),
@@ -109,7 +109,7 @@ void main() {
       journal: 'อ่านไม่ลง',
     ));
 
-    expect(await repo.minutesByDate(), {'2026-08-17': 107});
+    expect(await repo.secondsByDate(), {'2026-08-17': 6420});
   });
 
   test('ลบข้อมูลทั้งหมดแล้วโครงยังอยู่', () async {

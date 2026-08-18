@@ -26,7 +26,7 @@ class WallScreen extends StatefulWidget {
 }
 
 class _WallScreenState extends State<WallScreen> {
-  Map<String, int> _minutes = const {};
+  Map<String, int> _seconds = const {};
   DateTime? _selected;
   Day? _selectedDay;
 
@@ -39,8 +39,8 @@ class _WallScreenState extends State<WallScreen> {
   }
 
   Future<void> _load() async {
-    final minutes = await widget.store.minutesByDate();
-    if (mounted) setState(() => _minutes = minutes);
+    final seconds = await widget.store.secondsByDate();
+    if (mounted) setState(() => _seconds = seconds);
   }
 
   /// ทุกวันของปีนี้ เรียงเป็นคอลัมน์ละสัปดาห์ เริ่มจากวันอาทิตย์
@@ -55,7 +55,7 @@ class _WallScreenState extends State<WallScreen> {
     for (var d = first;
         !d.isAfter(last);
         d = d.add(const Duration(days: 1))) {
-      cells.add(wallLevel(_minutes[dateKey(d)] ?? 0));
+      cells.add(wallLevel(_seconds[dateKey(d)] ?? 0));
     }
     while (cells.length % kWallRows != 0) {
       cells.add(null);
@@ -87,8 +87,8 @@ class _WallScreenState extends State<WallScreen> {
     final inset = MediaQuery.paddingOf(context);
     final levels = _levels();
 
-    final totalMinutes = _minutes.values.fold(0, (a, b) => a + b);
-    final daysWithTime = _minutes.length;
+    final totalSeconds = _seconds.values.fold(0, (a, b) => a + b);
+    final daysWithTime = _seconds.length;
 
     return ColoredBox(
       color: colors.surface,
@@ -103,7 +103,7 @@ class _WallScreenState extends State<WallScreen> {
           _Header(
             handle: widget.store.meta.handle,
             year: _year,
-            totalMinutes: totalMinutes,
+            totalSeconds: totalSeconds,
             daysWithTime: daysWithTime,
             onClose: widget.onClose,
             colors: colors,
@@ -133,7 +133,7 @@ class _WallScreenState extends State<WallScreen> {
           if (_selected != null)
             _Detail(
               date: _selected!,
-              minutes: _minutes[dateKey(_selected!)] ?? 0,
+              seconds: _seconds[dateKey(_selected!)] ?? 0,
               day: _selectedDay,
               colors: colors,
             ),
@@ -149,7 +149,7 @@ class _Header extends StatelessWidget {
   const _Header({
     required this.handle,
     required this.year,
-    required this.totalMinutes,
+    required this.totalSeconds,
     required this.daysWithTime,
     required this.onClose,
     required this.colors,
@@ -157,7 +157,7 @@ class _Header extends StatelessWidget {
 
   final String handle;
   final int year;
-  final int totalMinutes;
+  final int totalSeconds;
   final int daysWithTime;
   final VoidCallback onClose;
   final LapseColors colors;
@@ -193,7 +193,7 @@ class _Header extends StatelessWidget {
           ),
           SizedBox(height: LapseSpace.s2),
           Text(
-            '${totalMinutes ~/ 60} ชั่วโมง · $daysWithTime วัน ในปี $year',
+            '${totalSeconds ~/ 3600} ชั่วโมง · $daysWithTime วัน ในปี $year',
             style: lapseTextStyle(LapseType.caption, color: colors.inkMuted),
           ),
         ],
@@ -322,13 +322,13 @@ class _Legend extends StatelessWidget {
 class _Detail extends StatelessWidget {
   const _Detail({
     required this.date,
-    required this.minutes,
+    required this.seconds,
     required this.day,
     required this.colors,
   });
 
   final DateTime date;
-  final int minutes;
+  final int seconds;
   final Day? day;
   final LapseColors colors;
 
@@ -351,7 +351,7 @@ class _Detail extends StatelessWidget {
             ),
             const Spacer(),
             Text(
-              minutes > 0 ? formatThai(minutes) : 'ไม่ได้อ่าน',
+              seconds > 0 ? formatThai(seconds) : 'ไม่ได้อ่าน',
               style: lapseTextStyle(LapseType.label, color: colors.ink2),
             ),
           ],
@@ -372,9 +372,9 @@ class _Detail extends StatelessWidget {
                     textHeightBehavior: lapseTextHeightBehavior,
                   ),
                 ),
-                if (line.minutes > 0)
+                if (line.seconds > 0)
                   Text(
-                    formatHm(line.minutes),
+                    formatHms(line.seconds),
                     style: lapseTextStyle(
                       LapseType.mono,
                       color: colors.ink2,

@@ -72,7 +72,7 @@ void main() {
       await Future<void>.delayed(Duration.zero);
 
       clock.tick(const Duration(minutes: 1));
-      expect(session.stop(), 13);
+      expect(session.stop(), 13 * 60);
     });
 
     test('สลับไปแอปอื่นสามนาทีแล้วเวลาไม่เพิ่ม', () async {
@@ -86,7 +86,7 @@ void main() {
       await Future<void>.delayed(Duration.zero);
 
       clock.tick(const Duration(minutes: 2));
-      expect(session.stop(), 7);
+      expect(session.stop(), 7 * 60);
     });
 
     test('เครื่องไม่มีรหัสผ่านถือว่าเป็นการสลับแอปเสมอ', () async {
@@ -101,7 +101,7 @@ void main() {
       lifecycle.didChangeAppLifecycleState(AppLifecycleState.resumed);
       await Future<void>.delayed(Duration.zero);
 
-      expect(session.stop(), 1);
+      expect(session.stop(), 60);
     });
 
     test('ลำดับที่ iOS ส่งจริงตอนสลับแอป', () async {
@@ -128,7 +128,7 @@ void main() {
       session.start();
       lifecycle.didChangeAppLifecycleState(AppLifecycleState.inactive);
       clock.tick(const Duration(minutes: 4));
-      expect(session.minutes, 4);
+      expect(session.seconds, 4 * 60);
     });
 
     test('ไม่ได้อยู่ใน session แล้วสลับแอปไม่ทำอะไร', () async {
@@ -136,7 +136,7 @@ void main() {
       lifecycle.didChangeAppLifecycleState(AppLifecycleState.resumed);
       await Future<void>.delayed(Duration.zero);
       expect(session.isRunning, isFalse);
-      expect(session.minutes, 0);
+      expect(session.seconds, 0);
     });
   });
 }

@@ -13,20 +13,20 @@ sealed class DayEntry {
 
 /// รายการหนึ่งบรรทัด — เป็นทั้ง todo, ตัวจับเวลา และบันทึกในตัวเดียว (§9)
 final class Line extends DayEntry {
-  const Line({required this.text, this.done = false, this.minutes = 0});
+  const Line({required this.text, this.done = false, this.seconds = 0});
 
   final String text;
   final bool done;
 
-  /// เวลาโฟกัสสะสมของบรรทัดนี้ หน่วยเป็น "นาที" (§2.3) · 0 = ยังไม่มีเวลา
-  final int minutes;
+  /// เวลาโฟกัสสะสมของบรรทัดนี้ หน่วยเป็น "วินาที" · 0 = ยังไม่มีเวลา
+  final int seconds;
 
-  bool get isBlank => text.trim().isEmpty && minutes == 0;
+  bool get isBlank => text.trim().isEmpty && seconds == 0;
 
-  Line copyWith({String? text, bool? done, int? minutes}) => Line(
+  Line copyWith({String? text, bool? done, int? seconds}) => Line(
         text: text ?? this.text,
         done: done ?? this.done,
-        minutes: minutes ?? this.minutes,
+        seconds: seconds ?? this.seconds,
       );
 
   @override
@@ -34,13 +34,13 @@ final class Line extends DayEntry {
       other is Line &&
       other.text == text &&
       other.done == done &&
-      other.minutes == minutes;
+      other.seconds == seconds;
 
   @override
-  int get hashCode => Object.hash(text, done, minutes);
+  int get hashCode => Object.hash(text, done, seconds);
 
   @override
-  String toString() => 'Line(${done ? "x" : " "}, "$text", $minutes)';
+  String toString() => 'Line(${done ? "x" : " "}, "$text", ${seconds}s)';
 }
 
 /// บรรทัดที่ parse ไม่ออก — เก็บไว้ดิบๆ ห้ามทิ้ง
@@ -79,8 +79,8 @@ class Day {
   /// เฉพาะรายการที่เรารู้จัก เรียงตามลำดับในไฟล์
   Iterable<Line> get lines => entries.whereType<Line>();
 
-  /// เวลารวมของวัน หน่วยนาที — แสดงที่แถบล่างของหน้า `day` (§4.1)
-  int get totalMinutes => lines.fold(0, (sum, l) => sum + l.minutes);
+  /// เวลารวมของวัน หน่วยวินาที — แสดงที่แถบล่างของหน้า `day` (§4.1)
+  int get totalSeconds => lines.fold(0, (sum, l) => sum + l.seconds);
 
   /// วันที่ไม่มีอะไรเลย — ไฟล์แบบนี้ห้ามถูกสร้าง และถ้ามีอยู่ต้องถูกลบ (§2.1)
   bool get isEmpty =>
@@ -123,7 +123,7 @@ class Day {
 
   @override
   String toString() =>
-      'Day(${dateKey(date)}, ${entries.length} entries, ${totalMinutes}m)';
+      'Day(${dateKey(date)}, ${entries.length} entries, ${totalSeconds}s)';
 }
 
 /// ตัดเวลาออกจาก [DateTime] เหลือแค่วัน ตามเขตเวลาของเครื่อง

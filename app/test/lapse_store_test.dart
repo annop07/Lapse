@@ -67,21 +67,21 @@ void main() {
   test('เวลาที่โฟกัสได้ถูกบวกสะสม', () async {
     final at = store.addLine();
     await store.setLineText(at, 'อ่านเลข');
-    await store.addMinutes(at, 47);
-    await store.addMinutes(at, 60);
+    await store.addSeconds(at, 2820);
+    await store.addSeconds(at, 3600);
 
-    expect(store.day.lines.single.minutes, 107);
+    expect(store.day.lines.single.seconds, 6420);
     expect(await fileFor(store.cursor).readAsString(),
-        '- [ ] อ่านเลข [1:47]\n');
+        '- [ ] อ่านเลข [1:47:00]\n');
   });
 
   test('บวกเวลาศูนย์หรือติดลบไม่ทำอะไร', () async {
     final at = store.addLine();
     await store.setLineText(at, 'อ่านเลข');
-    await store.addMinutes(at, 0);
-    await store.addMinutes(at, -5);
+    await store.addSeconds(at, 0);
+    await store.addSeconds(at, -5);
 
-    expect(store.day.lines.single.minutes, 0);
+    expect(store.day.lines.single.seconds, 0);
   });
 
   test('journal ถูกบันทึกและอยู่ใต้เส้นคั่น', () async {
@@ -137,14 +137,14 @@ void main() {
 
     expect(store.day.isEmpty, isTrue);
     expect(store.meta.handle, isEmpty);
-    expect(await store.minutesByDate(), isEmpty);
+    expect(await store.secondsByDate(), isEmpty);
   });
 
   test('minutesByDate เห็นวันที่มีเวลาเท่านั้น', () async {
     final at = store.addLine();
     await store.setLineText(at, 'อ่านเลข');
-    await store.addMinutes(at, 90);
+    await store.addSeconds(at, 5400);
 
-    expect(await store.minutesByDate(), {dateKey(store.cursor): 90});
+    expect(await store.secondsByDate(), {dateKey(store.cursor): 5400});
   });
 }

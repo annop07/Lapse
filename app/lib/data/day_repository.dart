@@ -100,16 +100,16 @@ class DayRepository {
     return dates;
   }
 
-  /// นาทีต่อวันของทั้งปี — ข้อมูลที่กำแพงต้องใช้ (§4.4)
+  /// วินาทีต่อวันของทั้งปี — ข้อมูลที่กำแพงต้องใช้ (§4.4)
   ///
   /// อ่านทุกไฟล์ตรงๆ ไม่ผ่านฐานข้อมูล หนึ่งปีคือ 365 ไฟล์ ไฟล์ละไม่กี่ร้อยไบต์
   /// ถ้าวันหนึ่งมันช้าจริงค่อยใส่ cache ทีหลัง อย่าเดาว่ามันช้าตั้งแต่ตอนนี้
-  Future<Map<String, int>> minutesByDate() async {
+  Future<Map<String, int>> secondsByDate() async {
     final result = <String, int>{};
     for (final date in await allDates()) {
       final day = await load(date);
-      final minutes = day.totalMinutes;
-      if (minutes > 0) result[dateKey(date)] = minutes;
+      final seconds = day.totalSeconds;
+      if (seconds > 0) result[dateKey(date)] = seconds;
     }
     return result;
   }

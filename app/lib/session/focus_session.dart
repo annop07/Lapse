@@ -31,14 +31,18 @@ class FocusSession {
     return _banked + _clock().difference(since);
   }
 
-  /// เวลาที่จะถูกบวกเข้ารายการจริงๆ หน่วยนาที
+  /// เวลาที่จะถูกบวกเข้ารายการจริงๆ หน่วยวินาที
   ///
   /// **ปัดลง** โดยตั้งใจ ตัวเลขบนกำแพงต้องไม่เคยมากกว่าเวลาที่ใช้ไปจริง
   /// เพราะทั้งผลิตภัณฑ์วางอยู่บนความน่าเชื่อถือของตัวเลขนั้น (§8 ข้อ 1)
-  int get minutes => elapsed.inMinutes;
+  int get seconds => elapsed.inSeconds;
 
-  /// session ที่สั้นกว่าหนึ่งนาทีถูกทิ้งทั้งหมด (§2.3)
-  bool get countsAtAll => minutes >= 1;
+  /// นับทุกวินาที ไม่ทิ้งอะไรเลย
+  ///
+  /// สเปก §2.3 เดิมทิ้ง session ที่สั้นกว่าหนึ่งนาที เพราะตอนนั้นหน่วยเป็นนาที
+  /// 30 วินาทีจึงปัดเป็นศูนย์และไม่มีความหมายที่จะเก็บ พอนับวินาทีได้แล้ว
+  /// เหตุผลนั้นหมดไป · การกดค้าง 560ms กับ 720ms ยังกันการเริ่มจบโดยบังเอิญอยู่
+  bool get countsAtAll => seconds >= 1;
 
   void start() {
     _banked = Duration.zero;
@@ -69,10 +73,10 @@ class FocusSession {
     _banked += gap;
   }
 
-  /// กดค้างจนครบเพื่อจบ · คืนจำนวนนาทีที่จะบวกเข้ารายการ (0 = ทิ้ง)
+  /// กดค้างจนครบเพื่อจบ · คืนจำนวนวินาทีที่จะบวกเข้ารายการ
   int stop() {
     pause();
-    final result = countsAtAll ? minutes : 0;
+    final result = countsAtAll ? seconds : 0;
     _banked = Duration.zero;
     return result;
   }

@@ -128,7 +128,7 @@ class _FocusScreenState extends State<FocusScreen> {
                           duration: LapseMotion.base,
                           curve: LapseMotion.out,
                           child: Text(
-                            formatHm(_session.elapsed.inMinutes),
+                            formatHms(_session.elapsed.inSeconds),
                             style: lapseTextStyle(
                               LapseType.display,
                               color: _onVoid.ink2,
