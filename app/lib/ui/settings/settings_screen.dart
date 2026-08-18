@@ -48,6 +48,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return ColoredBox(
       color: colors.surface,
       child: ListView(
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         padding: EdgeInsets.fromLTRB(
           LapseSpace.gutter,
           inset.top + LapseSpace.s5,
@@ -255,6 +256,10 @@ class _HandleFieldState extends State<_HandleField> {
             cursorColor: colors.ink,
             backgroundCursorColor: colors.inkFaint,
             selectionColor: colors.rule,
+            // ถ้าไม่บอก iOS ว่าใช้คีย์บอร์ดแบบไหน มันจะขึ้นสว่างเสมอแม้แอปจะเป็นธีมมืด
+            keyboardAppearance: LapseTheme.of(context).isDark
+                ? Brightness.dark
+                : Brightness.light,
             style: lapseTextStyle(LapseType.body, color: colors.ink),
           ),
         ],

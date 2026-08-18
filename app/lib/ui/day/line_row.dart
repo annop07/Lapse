@@ -77,6 +77,10 @@ class LineRow extends StatelessWidget {
                     cursorColor: colors.ink,
                     backgroundCursorColor: colors.inkFaint,
                     selectionColor: colors.rule,
+                    // ถ้าไม่บอก iOS ว่าใช้คีย์บอร์ดแบบไหน มันจะขึ้นสว่างเสมอแม้แอปจะเป็นธีมมืด
+                    keyboardAppearance: LapseTheme.of(context).isDark
+                        ? Brightness.dark
+                        : Brightness.light,
                     textHeightBehavior: lapseTextHeightBehavior,
                     style: lapseTextStyle(
                       LapseType.body,

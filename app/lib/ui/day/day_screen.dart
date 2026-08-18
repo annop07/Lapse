@@ -146,6 +146,8 @@ class DayScreenState extends State<DayScreen> {
     final inset = MediaQuery.paddingOf(context);
 
     return GestureDetector(
+      // แตะที่ใดก็ตามที่ไม่ใช่ช่องพิมพ์แล้วปิดคีย์บอร์ด
+      onTap: () => FocusScope.of(context).unfocus(),
       // ปัดซ้ายขวาเปลี่ยนวัน (§4.1)
       onHorizontalDragEnd: (details) {
         final v = details.primaryVelocity ?? 0;
@@ -172,6 +174,12 @@ class DayScreenState extends State<DayScreen> {
             Expanded(
               child: CustomScrollView(
                 controller: _scroll,
+                // ปัดลงเพื่อปิดคีย์บอร์ด — ท่ามาตรฐานของ iOS
+                //
+                // ก่อนหน้านี้ไม่มีทางปิดคีย์บอร์ดเลย แปลว่าพอเริ่มพิมพ์แล้ว
+                // จะเข้าหน้าโฟกัสไม่ได้จนกว่าจะเปลี่ยนวัน
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
                 slivers: [
                   SliverPadding(
                     padding:
@@ -465,6 +473,10 @@ class _Journal extends StatelessWidget {
               cursorColor: colors.ink,
               backgroundCursorColor: colors.inkFaint,
               selectionColor: colors.rule,
+              // ถ้าไม่บอก iOS ว่าใช้คีย์บอร์ดแบบไหน มันจะขึ้นสว่างเสมอแม้แอปจะเป็นธีมมืด
+              keyboardAppearance: LapseTheme.of(context).isDark
+                  ? Brightness.dark
+                  : Brightness.light,
               textHeightBehavior: lapseTextHeightBehavior,
               style: style,
             ),
