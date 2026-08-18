@@ -103,7 +103,14 @@ class _RootState extends State<_Root> {
     super.dispose();
   }
 
-  void _startFocus(int lineIndex) => setState(() => _focusedLine = lineIndex);
+  void _startFocus(int lineIndex) {
+    // ปิดคีย์บอร์ดก่อนเข้าจอโฟกัสเสมอ
+    //
+    // จอโฟกัสเป็นเลเยอร์ทับหน้าวัน ช่องพิมพ์ข้างล่างจึงยังถือโฟกัสอยู่
+    // และคีย์บอร์ดจะค้างขึ้นมาทับจอดำ ซึ่งขัดกับทั้งหน้านั้นทั้งหน้า
+    FocusManager.instance.primaryFocus?.unfocus();
+    setState(() => _focusedLine = lineIndex);
+  }
 
   /// จบ session แล้วส่งต่อไปที่บันทึก — หกขั้นตามสเปก §4.3
   Future<void> _finishFocus(int seconds) async {

@@ -166,6 +166,33 @@ void main() {
     expect(text, contains('จำได้แค่สูตรอนุพันธ์'));
   });
 
+  testWidgets('เข้าจอโฟกัสแล้วคีย์บอร์ดต้องไม่ค้างขึ้นมา', (tester) async {
+    app.main();
+    await settle(tester);
+    await tester.enterText(find.byType(EditableText).first, 'อ่านเลข');
+    await settle(tester);
+    await tester.tap(find.text('ต่อไป'));
+    await settle(tester);
+
+    // พิมพ์ในช่องบันทึกก่อน เพื่อให้มีช่องที่ถือโฟกัสอยู่จริงๆ
+    await tester.tap(find.byType(EditableText).last);
+    await settle(tester);
+    expect(FocusManager.instance.primaryFocus?.hasFocus, isTrue);
+
+    final hold = await tester.startGesture(
+      tester.getCenter(find.byType(LineRow)),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 700));
+    await hold.up();
+    await settle(tester);
+
+    expect(find.byType(FocusScreen), findsOneWidget);
+    // ไม่มีช่องพิมพ์ไหนถือโฟกัสอยู่ = คีย์บอร์ดลงแล้ว
+    final focused = FocusManager.instance.primaryFocus;
+    expect(focused == null || focused.context?.widget is! EditableText, isTrue);
+  });
+
   testWidgets('เปลี่ยนวันด้วยลูกศร และห้ามไปวันอนาคต', (tester) async {
     app.main();
     await settle(tester);

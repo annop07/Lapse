@@ -63,6 +63,10 @@ class _FocusScreenState extends State<FocusScreen> {
     super.initState();
     _lifecycle.attach();
     _session.start();
+    // กันไว้อีกชั้น เผื่อมีอะไรขอโฟกัสหลังจากหน้านี้ขึ้นมาแล้ว
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => FocusManager.instance.primaryFocus?.unfocus(),
+    );
     if (!widget.isFirstEver) {
       Future.delayed(const Duration(milliseconds: 2600), () {
         if (mounted) setState(() => _settled = true);
