@@ -7,7 +7,10 @@
 /// S3 จับเวลาแล้วแยกจอล็อกออกจากการสลับแอป — ต้องรันบน iPhone จริงเท่านั้น
 library;
 
+import 'dart:io';
+
 import 'package:flutter/widgets.dart';
+import 'package:path_provider/path_provider.dart';
 
 import 'session/focus_session.dart';
 import 'session/screen_lock.dart';
@@ -165,6 +168,7 @@ class _LifecycleSampleState extends State<_LifecycleSample>
       SessionLifecycle(session: _session, screenLock: _lock);
 
   final _log = <String>[];
+  File? _logFile;
   String _passcode = 'ยังไม่ได้ถาม';
 
   @override
@@ -173,6 +177,7 @@ class _LifecycleSampleState extends State<_LifecycleSample>
     _lifecycle.attach();
     WidgetsBinding.instance.addObserver(this);
     _session.start();
+    _openLogFile();
     _note('เริ่ม session');
     _askPasscode();
   }
@@ -182,6 +187,20 @@ class _LifecycleSampleState extends State<_LifecycleSample>
     WidgetsBinding.instance.removeObserver(this);
     _lifecycle.detach();
     super.dispose();
+  }
+
+  /// เขียน log ลงไฟล์ด้วย เพราะการเชื่อมต่อดีบักหลุดตอนจอดับ
+  ///
+  /// ไฟล์นี้อ่านย้อนหลังได้แม้สายจะขาดไปแล้ว ซึ่งเป็นกรณีที่เกิดขึ้นจริง
+  /// ตอนทดสอบผ่านการเชื่อมต่อไร้สาย
+  Future<void> _openLogFile() async {
+    final docs = await getApplicationDocumentsDirectory();
+    _logFile = File('${docs.path}/spike.log');
+    await _logFile!.writeAsString(
+      '--- เริ่มรอบใหม่ ---\n',
+      mode: FileMode.append,
+      flush: true,
+    );
   }
 
   Future<void> _askPasscode() async {
@@ -194,6 +213,10 @@ class _LifecycleSampleState extends State<_LifecycleSample>
   }
 
   void _note(String line) {
+    // พิมพ์ออก console ด้วย เพราะบนเครื่องจริงการอ่าน log ง่ายกว่าถ่ายภาพหน้าจอ
+    debugPrint('SPIKE $line');
+    final stamp = DateTime.now().toIso8601String().substring(11, 19);
+    _logFile?.writeAsStringSync('$stamp  $line\n', mode: FileMode.append, flush: true);
     _log.insert(0, line);
     if (_log.length > 14) _log.removeLast();
     if (mounted) setState(() {});
@@ -207,8 +230,18 @@ class _LifecycleSampleState extends State<_LifecycleSample>
 
   Future<void> _reportWindow() async {
     final w = await _lock.lastLockWindow();
+    final now = DateTime.now().millisecondsSinceEpoch;
     _note('ช่วงล็อกล่าสุด start=${w.start} end=${w.end}');
-    _note('เวลาสะสม ${_session.elapsed.inSeconds} วินาที');
+    if (w.start != null) {
+      _note('ล็อกเมื่อ ${(now - w.start!) ~/ 1000} วินาทีที่แล้ว');
+    }
+    _note('เวลาสะสมทันทีที่กลับมา ${_session.elapsed.inSeconds} วินาที');
+
+    // SessionLifecycle คืนเวลาให้แบบ async เพราะต้องถามฝั่งเนทีฟก่อน
+    // ถ้าอ่านทันทีจะได้ค่าก่อนการคืนเวลา ซึ่งทำให้แยกไม่ออกว่าไม่คืน
+    // หรือแค่ยังไม่ทันคืน จึงต้องอ่านซ้ำหลังทุกอย่างนิ่งแล้ว
+    await Future<void>.delayed(const Duration(seconds: 3));
+    _note('เวลาสะสมหลังนิ่งแล้ว ${_session.elapsed.inSeconds} วินาที');
   }
 
   @override
