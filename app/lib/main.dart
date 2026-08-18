@@ -12,6 +12,8 @@ import 'tokens/lapse_theme.dart';
 import 'tokens/lapse_tokens.dart';
 import 'ui/day/day_screen.dart';
 import 'ui/focus/focus_screen.dart';
+import 'ui/onboarding/onboarding_screen.dart';
+import 'ui/settings/settings_screen.dart';
 import 'ui/wall/wall_screen.dart';
 
 Future<void> main() async {
@@ -152,14 +154,30 @@ class _RootState extends State<_Root> {
 
   bool _wallOpen = false;
 
+  bool _settingsOpen = false;
+
   void _openWall() => setState(() => _wallOpen = true);
   void _closeWall() => setState(() => _wallOpen = false);
+  void _openSettings() => setState(() => _settingsOpen = true);
+  void _closeSettings() => setState(() => _settingsOpen = false);
+
+  /// จังหวะแรกของ onboarding — เขียนหนึ่งบรรทัดแล้วเข้าหน้าวันจริงเลย
+  Future<void> _finishOnboarding(String text) async {
+    final store = widget.store;
+    final at = store.addLine();
+    await store.setLineText(at, text);
+    await store.markOnboarded();
+  }
 
   @override
   Widget build(BuildContext context) {
     final store = widget.store;
     final lines = store.day.lines.toList();
     final focused = _focusedLine;
+
+    if (!store.meta.hasOnboarded) {
+      return OnboardingScreen(onWrote: _finishOnboarding);
+    }
 
     return Stack(
       children: [
@@ -171,9 +189,15 @@ class _RootState extends State<_Root> {
           journalPlaceholder: _placeholder,
           onStartFocus: _startFocus,
           onOpenWall: _openWall,
+          onOpenSettings: _openSettings,
         ),
-        if (_wallOpen)
-          WallScreen(store: store, onClose: _closeWall),
+        if (_wallOpen) WallScreen(store: store, onClose: _closeWall),
+        if (_settingsOpen)
+          SettingsScreen(
+            store: store,
+            onClose: _closeSettings,
+            onExport: store.exporter.share,
+          ),
         if (focused != null)
           FocusScreen(
             what: focused < lines.length ? lines[focused].text : '',

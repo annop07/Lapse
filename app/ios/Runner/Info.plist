@@ -66,5 +66,12 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<!-- โฟลเดอร์ lapse/ ต้องมองเห็นและเปิดแก้ได้จากแอป Files โดยตรง
+	     นี่คือรูปแบบที่แข็งแรงที่สุดของหลักการข้อ 4 ข้อมูลเป็นของผู้ใช้
+	     ไม่ต้องกดส่งออกก่อนถึงจะเข้าถึงได้ -->
+	<key>UIFileSharingEnabled</key>
+	<true/>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
 </dict>
 </plist>

@@ -21,6 +21,7 @@ class DayScreen extends StatefulWidget {
     required this.store,
     required this.onStartFocus,
     required this.onOpenWall,
+    required this.onOpenSettings,
     this.journalFocus,
     this.journalController,
     this.journalPlaceholder = kJournalPlaceholder,
@@ -33,6 +34,7 @@ class DayScreen extends StatefulWidget {
   final void Function(int lineIndex) onStartFocus;
 
   final VoidCallback onOpenWall;
+  final VoidCallback onOpenSettings;
 
   /// หน้าโฟกัสส่งกลับมาเพื่อเด้งเคอร์เซอร์เข้าช่องบันทึก (§4.3)
   final FocusNode? journalFocus;
@@ -152,10 +154,20 @@ class DayScreenState extends State<DayScreen> {
       },
       child: ColoredBox(
         color: colors.surface,
-        child: Column(
+        // ไม่ได้ใช้ Scaffold จึงไม่มี resizeToAvoidBottomInset มาให้
+        // ต้องย่อเนื้อหาขึ้นเหนือคีย์บอร์ดเอง ไม่งั้นมันจะทับสิ่งที่กำลังพิมพ์
+        child: Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.viewInsetsOf(context).bottom,
+          ),
+          child: Column(
           children: [
             SizedBox(height: inset.top),
-            _TopBar(onOpenWall: widget.onOpenWall, colors: colors),
+            _TopBar(
+              onOpenWall: widget.onOpenWall,
+              onOpenSettings: widget.onOpenSettings,
+              colors: colors,
+            ),
             _DateHeader(store: store, colors: colors),
             Expanded(
               child: CustomScrollView(
@@ -207,7 +219,8 @@ class DayScreenState extends State<DayScreen> {
               colors: colors,
               bottomInset: inset.bottom,
             ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -215,9 +228,14 @@ class DayScreenState extends State<DayScreen> {
 }
 
 class _TopBar extends StatelessWidget {
-  const _TopBar({required this.onOpenWall, required this.colors});
+  const _TopBar({
+    required this.onOpenWall,
+    required this.onOpenSettings,
+    required this.colors,
+  });
 
   final VoidCallback onOpenWall;
+  final VoidCallback onOpenSettings;
   final LapseColors colors;
 
   @override
@@ -225,9 +243,23 @@ class _TopBar extends StatelessWidget {
         padding: EdgeInsets.symmetric(horizontal: LapseSpace.gutter),
         child: Row(
           children: [
-            Text(
-              'LAPSE',
-              style: lapseTextStyle(LapseType.micro, color: colors.inkFaint),
+            // wordmark เป็นทางเข้าหน้าตั้งค่า ไม่ต้องมีไอคอนเฟืองมาเพิ่มความรก
+            GestureDetector(
+              onTap: onOpenSettings,
+              behavior: HitTestBehavior.opaque,
+              child: SizedBox(
+                height: LapseSpace.touch,
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'LAPSE',
+                    style: lapseTextStyle(
+                      LapseType.micro,
+                      color: colors.inkFaint,
+                    ),
+                  ),
+                ),
+              ),
             ),
             const Spacer(),
             // ลิงก์ไปกำแพงต้องไม่ดึงสายตา — micro และจาง

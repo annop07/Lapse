@@ -12,6 +12,7 @@ import 'dart:io';
 import 'package:flutter/widgets.dart';
 
 import '../data/day_repository.dart';
+import '../data/exporter.dart';
 import '../data/meta_store.dart';
 import '../model/day.dart';
 
@@ -153,6 +154,9 @@ class LapseStore extends ChangeNotifier {
     notifyListeners();
     await _metaFile.save(next);
   }
+
+  /// ตัวส่งออก — ชี้ไปที่โฟลเดอร์ `lapse/` ทั้งก้อน
+  Exporter get exporter => Exporter(_days.root);
 
   Future<void> deleteEverything() async {
     await _days.deleteEverything();
