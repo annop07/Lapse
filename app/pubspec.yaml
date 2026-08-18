@@ -20,6 +20,8 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  integration_test:
+    sdk: flutter
 
 flutter:
   # ระบบนี้ไม่ใช้คอมโพเนนต์ของ Material เลยสักตัว วาดเองทั้งหมด (§6.4)
