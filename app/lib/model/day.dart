@@ -90,6 +90,21 @@ class Day {
             RawLine r => r.isBlank,
           });
 
+  /// ตำแหน่งใน [entries] ของรายการลำดับที่ [lineIndex]
+  ///
+  /// หน้าจอแสดงเฉพาะ [lines] แต่ [RawLine] ยังนั่งแทรกอยู่ในไฟล์ตามเดิม
+  /// การแก้รายการจึงต้องแปลงลำดับที่ผู้ใช้เห็นกลับเป็นตำแหน่งจริงก่อนเสมอ
+  /// คืน -1 ถ้าไม่มีรายการลำดับนั้น
+  int entryIndexOfLine(int lineIndex) {
+    var seen = 0;
+    for (var i = 0; i < entries.length; i++) {
+      if (entries[i] is! Line) continue;
+      if (seen == lineIndex) return i;
+      seen++;
+    }
+    return -1;
+  }
+
   /// ตัดบรรทัดว่างที่ไม่มีทั้งชื่อและเวลาออก ก่อนเขียนลงไฟล์
   ///
   /// หน้า `day` สร้างบรรทัดว่างทันทีที่กด `+` ถ้าผู้ใช้ไม่พิมพ์อะไรแล้วเปลี่ยนวัน
