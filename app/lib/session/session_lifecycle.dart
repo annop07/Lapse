@@ -49,6 +49,15 @@ class SessionLifecycle with WidgetsBindingObserver {
   }
 
   void _onLeft() {
+    // การ์ดบรรทัดนี้รับน้ำหนักจริง ไม่ใช่การกันเหนียว
+    //
+    // ลำดับที่ iOS ส่งจริงตอนสลับแอปคือ
+    //   ขาออก  inactive → hidden → paused
+    //   ขากลับ hidden → inactive → resumed
+    //
+    // `hidden` มาสองครั้ง และครั้งที่สองมาตอนกำลังกลับเข้าแอป
+    // ถ้าไม่เช็กว่ายังนับอยู่ไหม ครั้งที่สองจะเขียนทับ [_leftAt]
+    // ด้วยเวลาปัจจุบัน แล้วช่วงที่หายไปจะถูกคิดเป็นศูนย์
     if (!session.isRunning) return;
     _leftAt = _clock();
     session.pause();

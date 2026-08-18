@@ -104,6 +104,26 @@ void main() {
       expect(session.stop(), 1);
     });
 
+    test('ลำดับที่ iOS ส่งจริงตอนสลับแอป', () async {
+      // ลำดับนี้บันทึกมาจากการรันจริง ไม่ได้เดา
+      // จุดสำคัญคือ hidden มาสองครั้ง และครั้งที่สองมาตอนกลับเข้าแอป
+      session.start();
+      clock.tick(const Duration(seconds: 11));
+
+      lifecycle.didChangeAppLifecycleState(AppLifecycleState.inactive);
+      lifecycle.didChangeAppLifecycleState(AppLifecycleState.hidden);
+      lifecycle.didChangeAppLifecycleState(AppLifecycleState.paused);
+
+      clock.tick(const Duration(seconds: 30));
+
+      lifecycle.didChangeAppLifecycleState(AppLifecycleState.hidden);
+      lifecycle.didChangeAppLifecycleState(AppLifecycleState.inactive);
+      lifecycle.didChangeAppLifecycleState(AppLifecycleState.resumed);
+      await Future<void>.delayed(Duration.zero);
+
+      expect(session.elapsed, const Duration(seconds: 11));
+    });
+
     test('inactive อย่างเดียวไม่หยุดนับ', () {
       session.start();
       lifecycle.didChangeAppLifecycleState(AppLifecycleState.inactive);
